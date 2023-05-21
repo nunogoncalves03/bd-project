@@ -33,7 +33,7 @@ CREATE TABLE orders (
 
 CREATE TABLE sales (
     order_no INTEGER PRIMARY KEY,
-    FOREIGN KEY (order_no) REFERENCES orders (order_no)
+    FOREIGN KEY (order_no) REFERENCES orders (order_no) ON DELETE CASCADE
 );
 
 CREATE TABLE pay (
@@ -83,12 +83,12 @@ CREATE TABLE works (
 
 CREATE TABLE offices (
     "address" VARCHAR(100) PRIMARY KEY,
-    FOREIGN KEY ("address") REFERENCES workplaces ("address")
+    FOREIGN KEY ("address") REFERENCES workplaces ("address") ON DELETE CASCADE
 );
 
 CREATE TABLE warehouses (
     "address" VARCHAR(100) PRIMARY KEY,
-    FOREIGN KEY ("address") REFERENCES workplaces ("address")
+    FOREIGN KEY ("address") REFERENCES workplaces ("address") ON DELETE CASCADE
 );
 
 CREATE TABLE products (
@@ -102,7 +102,7 @@ CREATE TABLE products (
 CREATE TABLE ean_products (
     sku VARCHAR(20) PRIMARY KEY,
     ean VARCHAR(14) NOT NULL,
-    FOREIGN KEY (sku) REFERENCES products (sku)
+    FOREIGN KEY (sku) REFERENCES products (sku) ON DELETE CASCADE
 );
 
 CREATE TABLE suppliers (
