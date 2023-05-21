@@ -126,7 +126,8 @@ VALUES
     ('321654987', 'Emily Davis', '987 Maple Road', 'SKU444', DATE '2023-05-21'),
     ('789123456', 'Michael Wilson', '321 Pine Court', 'SKU555', DATE '2023-05-21');
     -- SKU444 e SKU555 acima de 50$
-    -- SKU555 mais vendido
+    -- SKU444 mais vendido
+    -- SKU555 mais encomendado
 
 INSERT INTO contains (order_no, sku, qty)
 VALUES
