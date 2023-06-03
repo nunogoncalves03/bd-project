@@ -1,15 +1,15 @@
 INSERT INTO customer (cust_no, "name", email, phone, "address")
 VALUES
-    (1, 'Manuel', 'manuel24@gmail.com', '933444555', 'Rua dos Clerigos 14 1Esq'),
-    (2, 'Joao', 'joao-1@gmail.com', '933423662', 'Rua do Cacto 10 2Dir'),
-    (3, 'Rui', 'ruiii@gmail.com', '924444333', 'Rua das Rosas 110 2Esq'),
-    (4, 'Fabio', 'fmata@gmail.com', '933333333', 'Avenida da Liberdade 130 1Dir'),
-    (5, 'Nuno', 'ngfg@gmail.com', '922777777', 'Rua dos Assaltos 25 2Esq'),
-    (6, 'Diogo', 'yasuo@gmail.com', '911222333', 'Largo D. Afonso Henriques 60 R/C Esq'),
-    (7, 'Pedro', 'piedro@gmail.com', '934567890', 'Rua D. Sancho I 40 1Dir'),
-    (8, 'Ana', 'ana@gmail.com', '933322111', 'Rua Do Grilo 22 3Dir'),
-    (9, 'Celia', 'celia23@sapo.com', '921444222', 'Rua das Trigosas 13 2Esq'),
-    (10, 'Sara', 'sara@outlook.com', '933333322', 'Rua da Revolucao 79 2Dir');
+    (1, 'Manuel', 'manuel24@gmail.com', '933444555', 'Rua dos Clerigos 14 1Esq 4050-205 Vitoria'),
+    (2, 'Joao', 'joao-1@gmail.com', '933423662', 'Rua do Cacto 10 2Dir 1200-234 Alcantara'),
+    (3, 'Rui', 'ruiii@gmail.com', '924444333', 'Rua das Rosas 110 2Esq 1000-500 Alvalade'),
+    (4, 'Fabio', 'fmata@gmail.com', '933333333', 'Avenida da Liberdade 130 1Dir 1250-142 Santo Antonio'),
+    (5, 'Nuno', 'ngfg@gmail.com', '922777777', 'Rua dos Assaltos 25 3000-500 Odivelas'),
+    (6, 'Diogo', 'yasuo@gmail.com', '911222333', 'Largo D. Afonso Henriques 60 R/C Esq 3004-500 Ramada'),
+    (7, 'Pedro', 'piedro@gmail.com', '934567890', 'Rua D. Sancho I 40 1Dir 2955-500 Almada'),
+    (8, 'Ana', 'ana@gmail.com', '933322111', 'Rua Do Grilo 22 3Dir 5000-500 Porto'),
+    (9, 'Celia', 'celia23@sapo.com', '921444222', 'Rua das Trigosas 13 2Esq 2005-457 Santarem'),
+    (10, 'Sara', 'sara@outlook.com', '933333322', 'Rua da Revolucao 79 2Dir 2330-500 Torres Novas');
 
 INSERT INTO orders (order_no, "date", cust_no)
 VALUES
@@ -27,10 +27,10 @@ VALUES
 INSERT INTO pay (order_no, cust_no)
 VALUES
     (1,1),
-    (3,2),
-    (5,4),
-    (7,5),
-    (9,7);
+    (3,3),
+    (5,5),
+    (7,7),
+    (9,9);
 
 
 INSERT INTO employee (ssn, tin, bdate, "name")
@@ -74,36 +74,36 @@ VALUES
 
 INSERT INTO workplace ("address", lat, long)
 VALUES
-    ('Avenida da Liberdade 10', 40.7128, -70.2345),
-    ('Rua dos Clerigos 5', 38.2228, -80.4454),
-    ('Alameda D. Afonso Henriques 35', 30.3344, -69.0003),
-    ('Rua das Cruzes 7', 39.3333, -85.2222);
+    ('Avenida da Liberdade 10 1250-142 Santo Antonio', 40.7128, -70.2345),
+    ('Rua dos Clerigos 5 4050-205 Vitoria', 38.2228, -80.4454),
+    ('D. Afonso Henriques 35 1000-123 Alameda', 30.3344, -69.0003),
+    ('Rua das Cruzes 7 2664-255 Cruzadas', 39.3333, -85.2222);
 
 
 INSERT INTO office ("address")
 VALUES
-    ('Avenida da Liberdade 10'),
-    ('Alameda D. Afonso Henriques 35');
+    ('Avenida da Liberdade 10 1250-142 Santo Antonio'),
+    ('Rua dos Clerigos 5 4050-205 Vitoria');
     
 INSERT INTO warehouse ("address")
 VALUES
-    ('Alameda D. Afonso Henriques 35'),
-    ('Rua das Cruzes 7');
+    ('D. Afonso Henriques 35 1000-123 Alameda'),
+    ('Rua das Cruzes 7 2664-255 Cruzadas');
 
 INSERT INTO works (ssn, "name", "address")
 VALUES
-    ('123-45-6789', 'Marketing', 'Avenida da Liberdade 10'),
-    ('987-65-4321', 'Marketing', 'Avenida da Liberdade 10'),
-    ('456-78-9012', 'Sales', 'Alameda D. Afonso Henriques 35'),
-    ('789-01-2345', 'Sales', 'Rua dos Clerigos 5'),
-    ('234-56-7890', 'Finance', 'Avenida da Liberdade 10'),
-    ('567-89-0123', 'Finance', 'Alameda D. Afonso Henriques 35'),
-    ('890-12-3456', 'Human Resources', 'Rua das Cruzes 7'),
-    ('345-67-8901', 'Human Resources', 'Avenida da Liberdade 10'),
-    ('678-90-1234', 'Operations', 'Rua das Cruzes 7'),
-    ('901-23-4567', 'Operations', 'Rua dos Clerigos 5'),
-    ('111-22-3333', 'Productions', 'Rua das Cruzes 7'),
-    ('222-33-4444', 'Productions', 'Rua das Cruzes 7');
+    ('123-45-6789', 'Marketing', 'Avenida da Liberdade 10 1250-142 Santo Antonio'),
+    ('987-65-4321', 'Marketing', 'Avenida da Liberdade 10 1250-142 Santo Antonio'),
+    ('456-78-9012', 'Sales', 'D. Afonso Henriques 35 1000-123 Alameda'),
+    ('789-01-2345', 'Sales', 'Rua dos Clerigos 5 4050-205 Vitoria'),
+    ('234-56-7890', 'Finance', 'Avenida da Liberdade 10 1250-142 Santo Antonio'),
+    ('567-89-0123', 'Finance', 'D. Afonso Henriques 35 1000-123 Alameda'),
+    ('890-12-3456', 'Human Resources', 'Rua das Cruzes 7 2664-255 Cruzadas'),
+    ('345-67-8901', 'Human Resources', 'Avenida da Liberdade 10 1250-142 Santo Antonio'),
+    ('678-90-1234', 'Operations', 'Rua das Cruzes 7 2664-255 Cruzadas'),
+    ('901-23-4567', 'Operations', 'Rua dos Clerigos 5 4050-205 Vitoria'),
+    ('111-22-3333', 'Productions', 'Rua das Cruzes 7 2664-255 Cruzadas'),
+    ('222-33-4444', 'Productions', 'Rua das Cruzes 7 2664-255 Cruzadas');
 
 
 INSERT INTO product (sku, "name", "description", price, ean)
@@ -140,24 +140,19 @@ VALUES
 
 INSERT INTO supplier (tin, "name", "address", sku, "date")
 VALUES
-    ('123456789', 'John Doe', '123 Main Street', 'SKU111', DATE '2023-05-21'),
-    ('987654321', 'Jane Smith', '456 Elm Avenue', 'SKU222', DATE '2023-05-21'),
-    ('456789123', 'David Johnson', '789 Oak Lane', 'SKU333', DATE '2023-05-21'),
-    ('321654987', 'Emily Davis', '987 Maple Road', 'SKU444', DATE '2023-05-21'),
-    ('789123456', 'Michael Wilson', '321 Pine Court', 'SKU555', DATE '2023-05-21');
+    ('123456789', 'John Doe', 'Rua do Cacto 12 1200-234 Alcantara', 'SKU111', DATE '2023-05-21'),
+    ('987654321', 'Jane Smith', 'Rua Do Grilo 22 5000-500 Porto', 'SKU222', DATE '2023-05-21'),
+    ('456789123', 'David Johnson', 'Rua D. Sancho I 65 2955-500 Almada', 'SKU333', DATE '2023-05-21'),
+    ('321654987', 'Emily Davis', 'Largo D. Afonso Henriques 25 3004-500 Ramada', 'SKU444', DATE '2023-05-21'),
+    ('789123456', 'Michael Wilson', 'Rua das Rosas 123 1000-500 Alvalade', 'SKU555', DATE '2023-05-21');
     -- SKU444 e SKU555 acima de 50$
     -- SKU444 mais vendido
     -- SKU555 mais encomendado
 
-
 INSERT INTO delivery ("address", tin)
 VALUES
-    ('Alameda D. Afonso Henriques 35', '123456789'),
-    ('Alameda D. Afonso Henriques 35', '987654321'),
-    ('Alameda D. Afonso Henriques 35', '456789123'),
-    ('Rua das Cruzes 7', '321654987'),
-    ('Rua das Cruzes 7', '789123456');
-
-
--- Eles removeram a sale e product_ean
--- INSERT INTO sale (order_no) VALUES (1),(3),(5),(7),(9);
+    ('D. Afonso Henriques 35 1000-123 Alameda', '123456789'),
+    ('D. Afonso Henriques 35 1000-123 Alameda', '987654321'),
+    ('D. Afonso Henriques 35 1000-123 Alameda', '456789123'),
+    ('Rua das Cruzes 7 2664-255 Cruzadas', '321654987'),
+    ('Rua das Cruzes 7 2664-255 Cruzadas', '789123456');
