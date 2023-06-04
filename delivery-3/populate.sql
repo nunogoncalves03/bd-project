@@ -22,7 +22,22 @@ VALUES
     (7, DATE '2023-01-10', 7),
     (8, DATE '2023-01-15', 8),
     (9, DATE '2023-01-20', 9),
-    (10, DATE '2023-01-25', 10);
+    (10, DATE '2023-01-25', 10),
+    (11, DATE '2023-01-30', 7);
+
+-- 2.2
+INSERT INTO orders (order_no, "date", cust_no)
+SELECT
+    generate_series(12, 376),
+    generate_series('2022-01-01'::TIMESTAMP, '2022-12-31'::TIMESTAMP, '1 day'),
+    1;
+
+-- 2.3
+INSERT INTO orders (order_no, "date", cust_no)
+SELECT
+    generate_series(377, 386),
+    generate_series('2022-01-01'::TIMESTAMP, '2022-12-31'::TIMESTAMP, '40 day'),
+    1;
 
 INSERT INTO pay (order_no, cust_no)
 VALUES
@@ -30,8 +45,14 @@ VALUES
     (3,3),
     (5,5),
     (7,7),
-    (9,9);
+    (9,9),
+    (11, 7);
 
+-- 2.2
+INSERT INTO pay (order_no, cust_no)
+SELECT
+    generate_series(12, 376),
+    1;
 
 INSERT INTO employee (ssn, tin, bdate, "name")
 VALUES
@@ -61,6 +82,12 @@ VALUES
     ('345-67-8901', 8),
     ('678-90-1234', 9),
     ('901-23-4567', 10);
+
+-- 2.2
+INSERT INTO process (ssn, order_no)
+SELECT
+    '123-45-6789',
+    generate_series(12, 376);
 
 
 INSERT INTO department ("name")
@@ -136,7 +163,22 @@ VALUES
     (9, 'SKU444', 14),
     (9, 'SKU555', 15),
     (10, 'SKU444', 16),
-    (10, 'SKU555', 17);
+    (10, 'SKU555', 17),
+    (11, 'SKU333', 35);
+
+-- 2.2
+INSERT INTO contains (order_no, sku, qty)
+SELECT
+    generate_series(12, 376),
+    'SKU111',
+    1;
+
+-- 2.3
+INSERT INTO contains (order_no, sku, qty)
+SELECT
+    generate_series(377, 386),
+    'SKU111',
+    1;
 
 INSERT INTO supplier (tin, "name", "address", sku, "date")
 VALUES
