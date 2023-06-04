@@ -35,8 +35,8 @@ SELECT
 -- 2.3
 INSERT INTO orders (order_no, "date", cust_no)
 SELECT
-    generate_series(377, 386),
-    generate_series('2022-01-01'::TIMESTAMP, '2022-12-31'::TIMESTAMP, '40 day'),
+    generate_series(377, 383),
+    generate_series('2022-01-01'::TIMESTAMP, '2022-12-31'::TIMESTAMP, '60 day'),
     1;
 
 INSERT INTO pay (order_no, cust_no)
@@ -46,7 +46,7 @@ VALUES
     (5,5),
     (7,7),
     (9,9),
-    (11, 7);
+    (11,7);
 
 -- 2.2
 INSERT INTO pay (order_no, cust_no)
@@ -176,7 +176,7 @@ SELECT
 -- 2.3
 INSERT INTO contains (order_no, sku, qty)
 SELECT
-    generate_series(377, 386),
+    generate_series(377, 383),
     'SKU111',
     1;
 
