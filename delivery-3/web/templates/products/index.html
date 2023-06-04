@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Products{% endblock %}</h1>
+<a href="">New</a>
+{% endblock %}
+
+{% block content %}
+{% for product in products %}
+<article class="post">
+    <header>
+        <div>
+            <h1>{{ product['name'] }}</h1>
+            <div class="about">{{ product['sku'] }} - {{ product['ean'] if product['ean'] != None else 'NO EAN' }}</div>
+        </div>
+        <a class="action" href="">Edit</a>
+        <a class="action" href="">Delete</a>
+    </header>
+    <p class="highlight">{{ product['price'] }} €</p>
+    <p class="body">{{ product['description'] if product['description'] != None else '' }}</p>
+</article>
+{% if not loop.last %}
+<hr>
+{% endif %}
+{% endfor %}
+{% endblock %}

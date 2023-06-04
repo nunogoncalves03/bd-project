@@ -43,17 +43,17 @@ log = app.logger
 
 
 @app.route("/", methods=("GET",))
-@app.route("/accounts", methods=("GET",))
-def account_index():
-    """Show all the accounts, most recent first."""
+@app.route("/products", methods=("GET",))
+def products_index():
+    """Show all the products, ordered by name."""
 
     with pool.connection() as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
-            accounts = cur.execute(
+            products = cur.execute(
                 """
-                SELECT account_number, branch_name, balance
-                FROM account
-                ORDER BY account_number DESC;
+                SELECT *
+                FROM product
+                ORDER BY name ASC;
                 """,
                 {},
             ).fetchall()
@@ -64,71 +64,71 @@ def account_index():
         request.accept_mimetypes["application/json"]
         and not request.accept_mimetypes["text/html"]
     ):
-        return jsonify(accounts)
+        return jsonify(products)
 
-    return render_template("account/index.html", accounts=accounts)
-
-
-@app.route("/accounts/<account_number>/update", methods=("GET", "POST"))
-def account_update(account_number):
-    """Update the account balance."""
-
-    with pool.connection() as conn:
-        with conn.cursor(row_factory=namedtuple_row) as cur:
-            account = cur.execute(
-                """
-                SELECT account_number, branch_name, balance
-                FROM account
-                WHERE account_number = %(account_number)s;
-                """,
-                {"account_number": account_number},
-            ).fetchone()
-            log.debug(f"Found {cur.rowcount} rows.")
-
-    if request.method == "POST":
-        balance = request.form["balance"]
-
-        error = None
-
-        if not balance:
-            error = "Balance is required."
-            if not balance.isnumeric():
-                error = "Balance is required to be numeric."
-
-        if error is not None:
-            flash(error)
-        else:
-            with pool.connection() as conn:
-                with conn.cursor(row_factory=namedtuple_row) as cur:
-                    cur.execute(
-                        """
-                        UPDATE account
-                        SET balance = %(balance)s
-                        WHERE account_number = %(account_number)s;
-                        """,
-                        {"account_number": account_number, "balance": balance},
-                    )
-                conn.commit()
-            return redirect(url_for("account_index"))
-
-    return render_template("account/update.html", account=account)
+    return render_template("products/index.html", products=products)
 
 
-@app.route("/accounts/<account_number>/delete", methods=("POST",))
-def account_delete(account_number):
-    """Delete the account."""
+# @app.route("/accounts/<account_number>/update", methods=("GET", "POST"))
+# def account_update(account_number):
+#     """Update the account balance."""
 
-    with pool.connection() as conn:
-        with conn.cursor(row_factory=namedtuple_row) as cur:
-            cur.execute(
-                """
-                DELETE FROM account
-                WHERE account_number = %(account_number)s;
-                """,
-                {"account_number": account_number},
-            )
-        conn.commit()
-    return redirect(url_for("account_index"))
+#     with pool.connection() as conn:
+#         with conn.cursor(row_factory=namedtuple_row) as cur:
+#             account = cur.execute(
+#                 """
+#                 SELECT account_number, branch_name, balance
+#                 FROM account
+#                 WHERE account_number = %(account_number)s;
+#                 """,
+#                 {"account_number": account_number},
+#             ).fetchone()
+#             log.debug(f"Found {cur.rowcount} rows.")
+
+#     if request.method == "POST":
+#         balance = request.form["balance"]
+
+#         error = None
+
+#         if not balance:
+#             error = "Balance is required."
+#             if not balance.isnumeric():
+#                 error = "Balance is required to be numeric."
+
+#         if error is not None:
+#             flash(error)
+#         else:
+#             with pool.connection() as conn:
+#                 with conn.cursor(row_factory=namedtuple_row) as cur:
+#                     cur.execute(
+#                         """
+#                         UPDATE account
+#                         SET balance = %(balance)s
+#                         WHERE account_number = %(account_number)s;
+#                         """,
+#                         {"account_number": account_number, "balance": balance},
+#                     )
+#                 conn.commit()
+#             return redirect(url_for("product_index"))
+
+#     return render_template("account/update.html", account=account)
+
+
+# @app.route("/accounts/<account_number>/delete", methods=("POST",))
+# def account_delete(account_number):
+#     """Delete the account."""
+
+#     with pool.connection() as conn:
+#         with conn.cursor(row_factory=namedtuple_row) as cur:
+#             cur.execute(
+#                 """
+#                 DELETE FROM account
+#                 WHERE account_number = %(account_number)s;
+#                 """,
+#                 {"account_number": account_number},
+#             )
+#         conn.commit()
+#     return redirect(url_for("product_index"))
 
 
 @app.route("/ping", methods=("GET",))
