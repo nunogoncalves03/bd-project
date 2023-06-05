@@ -148,3 +148,18 @@ input[type=submit] {
     align-self: start;
     min-width: 10em;
 }
+
+.delete-btn {
+    background: none;
+    border: none;
+    display: inline;
+    color: #377ba8;
+    text-decoration: underline;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+form.delete-form {
+    margin: 0;
+    display: block;
+}

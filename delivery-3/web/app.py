@@ -69,66 +69,121 @@ def products_index():
     return render_template("products/index.html", products=products)
 
 
-# @app.route("/accounts/<account_number>/update", methods=("GET", "POST"))
-# def account_update(account_number):
-#     """Update the account balance."""
+@app.route("/products/create", methods=("GET", "POST"))
+def product_create():
+    """Create a product."""
 
-#     with pool.connection() as conn:
-#         with conn.cursor(row_factory=namedtuple_row) as cur:
-#             account = cur.execute(
-#                 """
-#                 SELECT account_number, branch_name, balance
-#                 FROM account
-#                 WHERE account_number = %(account_number)s;
-#                 """,
-#                 {"account_number": account_number},
-#             ).fetchone()
-#             log.debug(f"Found {cur.rowcount} rows.")
+    if request.method == "POST":
+        sku = request.form["sku"]
+        name = request.form["name"]
+        description = request.form["description"]
+        price = request.form["price"]
+        ean = request.form["ean"]
 
-#     if request.method == "POST":
-#         balance = request.form["balance"]
+        error = ""
 
-#         error = None
+        if not sku:
+            error += "SKU is required. "
 
-#         if not balance:
-#             error = "Balance is required."
-#             if not balance.isnumeric():
-#                 error = "Balance is required to be numeric."
+        if not name:
+            error += "Name is required. "
 
-#         if error is not None:
-#             flash(error)
-#         else:
-#             with pool.connection() as conn:
-#                 with conn.cursor(row_factory=namedtuple_row) as cur:
-#                     cur.execute(
-#                         """
-#                         UPDATE account
-#                         SET balance = %(balance)s
-#                         WHERE account_number = %(account_number)s;
-#                         """,
-#                         {"account_number": account_number, "balance": balance},
-#                     )
-#                 conn.commit()
-#             return redirect(url_for("product_index"))
+        if not price:
+            error += "Price is required. "
+            if not price.isnumeric():
+                error += "Price is required to be numeric. "
+        
+        if not ean:
+            ean = None
 
-#     return render_template("account/update.html", account=account)
+        if error != "":
+            flash(error)
+        else:
+            with pool.connection() as conn:
+                with conn.cursor(row_factory=namedtuple_row) as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO product(SKU, name, description, price, ean)
+                        VALUES
+                            (
+                            %(sku)s,
+                            %(name)s,
+                            %(description)s,
+                            %(price)s,
+                            %(ean)s
+                            );
+                        """,
+                        {"sku": sku, "name": name, "description": description, "price": price, "ean": ean},
+                    )
+                conn.commit()
+            return redirect(url_for("products_index"))
+
+    return render_template("products/create.html")
+
+    
+@app.route("/products/<sku>/update", methods=("GET", "POST"))
+def product_update(sku):
+    """Update the product price and description."""
+
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            product = cur.execute(
+                """
+                SELECT *
+                FROM product
+                WHERE SKU = %(sku)s;
+                """,
+                {"sku": sku},
+            ).fetchone()
+            log.debug(f"Found {cur.rowcount} rows.")
+
+    if request.method == "POST":
+        price = request.form["price"]
+        description = request.form["description"]
+
+        error = ""
+
+        if not price:
+            error += "Price is required. "
+            if not price.isnumeric():
+                error += "Price is required to be numeric. "
+
+        if error != "":
+            flash(error)
+        else:
+            with pool.connection() as conn:
+                with conn.cursor(row_factory=namedtuple_row) as cur:
+                    cur.execute(
+                        """
+                        UPDATE product
+                        SET
+                            price = %(price)s,
+                            description = %(description)s
+                        WHERE SKU = %(sku)s;
+                        """,
+                        {"sku": sku, "price": price, "description": description},
+                    )
+                conn.commit()
+            return redirect(url_for("products_index"))
+
+    return render_template("products/update.html", product=product)
 
 
-# @app.route("/accounts/<account_number>/delete", methods=("POST",))
-# def account_delete(account_number):
-#     """Delete the account."""
+@app.route("/products/<sku>/delete", methods=("POST",))
+def product_delete(sku):
+    """Delete the product."""
 
-#     with pool.connection() as conn:
-#         with conn.cursor(row_factory=namedtuple_row) as cur:
-#             cur.execute(
-#                 """
-#                 DELETE FROM account
-#                 WHERE account_number = %(account_number)s;
-#                 """,
-#                 {"account_number": account_number},
-#             )
-#         conn.commit()
-#     return redirect(url_for("product_index"))
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            cur.execute(
+                """
+                DELETE FROM product
+                WHERE SKU = %(sku)s;
+                """,
+                {"sku": sku},
+            )
+        conn.commit()
+    return redirect(url_for("products_index"))
 
 
 @app.route("/ping", methods=("GET",))
