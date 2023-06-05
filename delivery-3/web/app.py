@@ -186,6 +186,103 @@ def product_delete(sku):
     return redirect(url_for("products_index"))
 
 
+@app.route("/", methods=("GET",))
+@app.route("/suppliers", methods=("GET",))
+def suppliers_index():
+    """Show all the suppliers, ordered by TIN."""
+
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            suppliers = cur.execute(
+                """
+                SELECT *
+                FROM supplier
+                ORDER BY TIN ASC;
+                """,
+                {},
+            ).fetchall()
+            log.debug(f"Found {cur.rowcount} rows.")
+
+    # API-like response is returned to clients that request JSON explicitly (e.g., fetch)
+    if (
+        request.accept_mimetypes["application/json"]
+        and not request.accept_mimetypes["text/html"]
+    ):
+        return jsonify(suppliers)
+
+    return render_template("suppliers/index.html", suppliers=suppliers)
+
+
+@app.route("/suppliers/create", methods=("GET", "POST"))
+def supplier_create():
+    """Create a supplier."""
+
+    if request.method == "POST":
+        tin = request.form["tin"]
+        name = request.form["name"]
+        address = request.form["address"]
+        sku = request.form["sku"]
+        date = request.form["date"]
+
+        error = ""
+
+        if not tin:
+            error += "TIN is required. "
+        
+        if not name:
+            name = None
+
+        if not address:
+            address = None
+
+        if not sku:
+            sku = None
+        
+        if not date:
+            date = None
+
+        if error != "":
+            flash(error)
+        else:
+            with pool.connection() as conn:
+                with conn.cursor(row_factory=namedtuple_row) as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO supplier(TIN, name, address, sku, date)
+                        VALUES
+                            (
+                            %(tin)s,
+                            %(name)s,
+                            %(address)s,
+                            %(sku)s,
+                            %(date)s
+                            );
+                        """,
+                        {"tin": tin, "name": name, "sku": sku, "address": address, "date": date},
+                    )
+                conn.commit()
+            return redirect(url_for("suppliers_index"))
+
+    return render_template("suppliers/create.html")
+
+
+@app.route("/suppliers/<tin>/delete", methods=("POST",))
+def supplier_delete(tin):
+    """Delete the supplier."""
+
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            cur.execute(
+                """
+                DELETE FROM supplier
+                WHERE TIN = %(tin)s;
+                """,
+                {"tin": tin},
+            )
+        conn.commit()
+    return redirect(url_for("suppliers_index"))
+
+
 @app.route("/ping", methods=("GET",))
 def ping():
     log.debug("ping!")
