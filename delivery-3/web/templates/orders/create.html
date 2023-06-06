@@ -1,0 +1,102 @@
+{% extends 'base.html' %} {% block header %}
+<h1>{% block title %}Place order{% endblock %}</h1>
+{% endblock %} {% block content %}
+<form id="myForm" method="post">
+	<label for="order_no">Order number</label>
+	<input
+		name="order_no"
+		id="order_no"
+		type="number"
+		value="{{ request.form['order_no'] }}"
+		required />
+
+	<label for="cust_no">Customer number</label>
+	<input
+		name="cust_no"
+		id="cust_no"
+		type="number"
+		value="{{ request.form['cust_no'] }}"
+		required />
+
+	<label for="date">Date</label>
+	<input name="date" id="date" type="date" required />
+
+	<label for="products-container">Products</label>
+	<div class="products-container"></div>
+	<div class="btn" onclick="add_product()">+ Add product</div>
+
+	<input type="submit" value="Create" onclick="submit_form(event)" />
+</form>
+
+<script>
+	const products = document.querySelector(".products-container");
+
+	function add_product() {
+		const new_product = document.createElement("div");
+		new_product.className = "product-container";
+
+		const product_sku = document.createElement("input");
+		product_sku.className = "product-sku";
+		product_sku.type = "text";
+		product_sku.placeholder = "SKUxxx";
+		product_sku.required = true;
+
+		const product_qty = document.createElement("input");
+		product_qty.className = "product-qty";
+		product_qty.type = "number";
+		product_qty.placeholder = "1";
+		product_qty.value = 1;
+		product_qty.required = true;
+		product_qty.min = 1;
+
+		new_product.appendChild(product_sku);
+		new_product.appendChild(product_qty);
+
+		products.appendChild(new_product);
+	}
+
+	function submit_form(event) {
+		// prevent submiting the form
+		event.preventDefault();
+
+		if (!document.querySelector("#myForm").reportValidity()) return;
+
+		// fetch all form data needed
+		const order_no = document.getElementById("order_no").value;
+		const cust_no = document.getElementById("cust_no").value;
+		const date = document.getElementById("date").value;
+
+		let products_array = [];
+		for (const element of products.children) {
+			const product_sku = element.firstChild;
+			const product_qty = element.lastChild;
+
+			products_array.push({
+				sku: product_sku.value,
+				qty: product_qty.value
+			});
+		}
+
+		fetch("/orders/create", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				order_no: order_no,
+				cust_no: cust_no,
+				date: date,
+				products: products_array
+			})
+		})
+			.then(function (res) {
+				window.location.href = res.url;
+			})
+			.catch(function (res) {
+				console.log(res);
+			});
+	}
+
+	window.addEventListener("load", add_product);
+</script>
+{% endblock %}

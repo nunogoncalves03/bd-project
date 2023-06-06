@@ -149,7 +149,7 @@ input[type=submit] {
     min-width: 10em;
 }
 
-.delete-btn {
+.delete-btn, .btn {
     background: none;
     border: none;
     display: inline;

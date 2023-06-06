@@ -42,7 +42,6 @@ app = Flask(__name__)
 log = app.logger
 
 
-@app.route("/", methods=("GET",))
 @app.route("/products", methods=("GET",))
 def products_index():
     """Show all the products, ordered by name."""
@@ -186,7 +185,6 @@ def product_delete(sku):
     return redirect(url_for("products_index"))
 
 
-@app.route("/", methods=("GET",))
 @app.route("/suppliers", methods=("GET",))
 def suppliers_index():
     """Show all the suppliers, ordered by TIN."""
@@ -281,6 +279,202 @@ def supplier_delete(tin):
             )
         conn.commit()
     return redirect(url_for("suppliers_index"))
+
+
+@app.route("/", methods=("GET",))
+@app.route("/customers", methods=("GET",))
+def customers_index():
+    """Show all the customers, ordered by name."""
+
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            customers = cur.execute(
+                """
+                SELECT *
+                FROM customer
+                ORDER BY name ASC;
+                """,
+                {},
+            ).fetchall()
+            log.debug(f"Found {cur.rowcount} rows.")
+
+    # API-like response is returned to clients that request JSON explicitly (e.g., fetch)
+    if (
+        request.accept_mimetypes["application/json"]
+        and not request.accept_mimetypes["text/html"]
+    ):
+        return jsonify(customers)
+
+    return render_template("customers/index.html", customers=customers)
+
+
+@app.route("/customers/create", methods=("GET", "POST"))
+def customer_create():
+    """Create a customer."""
+
+    if request.method == "POST":
+        cust_no = request.form["cust_no"]
+        name = request.form["name"]
+        email = request.form["email"]
+        phone = request.form["phone"]
+        address = request.form["address"]
+
+        error = ""
+
+        if not cust_no:
+            error += "Customer number is required. "
+
+            if not cust_no.isnumeric():
+                error += "Customer number is required to be numeric. "
+        
+        if not name:
+            error += "Name is required. "
+
+        if not email:
+            error += "Email is required. "
+
+        if not phone:
+            phone = None
+        
+        if not address:
+            address = None
+
+        if error != "":
+            flash(error)
+        else:
+            with pool.connection() as conn:
+                with conn.cursor(row_factory=namedtuple_row) as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO customer(cust_no, name, email, phone, address)
+                        VALUES
+                            (
+                            %(cust_no)s,
+                            %(name)s,
+                            %(email)s,
+                            %(phone)s,
+                            %(address)s
+                            );
+                        """,
+                        {"cust_no": cust_no, "name": name, "email": email, "phone": phone, "address": address},
+                    )
+                conn.commit()
+            return redirect(url_for("customers_index"))
+
+    return render_template("customers/create.html")
+
+
+@app.route("/customers/<cust_no>/delete", methods=("POST",))
+def customer_delete(cust_no):
+    """Delete the customer."""
+
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            cur.execute(
+                """
+                DELETE FROM customer
+                WHERE cust_no = %(cust_no)s;
+                """,
+                {"cust_no": cust_no},
+            )
+        conn.commit()
+    return redirect(url_for("customers_index"))
+
+
+@app.route("/orders", methods=("GET",))
+def orders_index():
+    """Show all the orders, most recent first."""
+
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            orders = cur.execute(
+                """
+                SELECT *
+                FROM orders
+                ORDER BY date DESC;
+                """,
+                {},
+            ).fetchall()
+            log.debug(f"Found {cur.rowcount} rows.")
+
+    # API-like response is returned to clients that request JSON explicitly (e.g., fetch)
+    if (
+        request.accept_mimetypes["application/json"]
+        and not request.accept_mimetypes["text/html"]
+    ):
+        return jsonify(orders)
+
+    return render_template("orders/index.html", orders=orders)
+
+
+@app.route("/orders/create", methods=("GET", "POST"))
+def order_create():
+    """Create a order."""
+
+    if request.method == "POST":
+        body = request.json
+
+        error = ""
+
+        if not body["order_no"]:
+            error += "Order number is required. "
+
+            if not body["order_no"].isnumeric():
+                error += "Order number is required to be numeric. "
+
+        if not body["cust_no"]:
+            error += "Customer number is required. "
+
+            if not body["cust_no"].isnumeric():
+                error += "Customer number is required to be numeric. "
+        
+        if not body["date"]:
+            error += "Date is required. "
+
+        if not body["products"] or len(body["products"]) == 0:
+            error += "Products are required. "
+        else:
+            for product in body["products"]:
+                if not product["sku"] or not product["qty"]:
+                    error += "Products are required. "
+                    break
+
+        if error != "":
+            flash(error)
+        else:
+            with pool.connection() as conn:
+                with conn.cursor(row_factory=namedtuple_row) as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO orders(order_no, cust_no, date)
+                        VALUES
+                            (
+                            %(order_no)s,
+                            %(cust_no)s,
+                            %(date)s
+                            );
+                        """,
+                        {"order_no": body["order_no"], "cust_no": body["cust_no"], "date": body["date"]},
+                    )
+
+                    for product in body["products"]:
+                        cur.execute(
+                            """
+                            INSERT INTO contains(order_no, SKU, qty)
+                            VALUES
+                                (
+                                %(order_no)s,
+                                %(SKU)s,
+                                %(qty)s
+                                );
+                            """,
+                            {"order_no": body["order_no"], "SKU": product["sku"], "qty": product["qty"]},
+                        )
+
+                conn.commit()
+            return redirect(url_for("orders_index"))
+
+    return render_template("orders/create.html")
 
 
 @app.route("/ping", methods=("GET",))
