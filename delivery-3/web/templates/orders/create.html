@@ -25,13 +25,13 @@
 	<div class="products-container"></div>
 	<div class="btn" onclick="add_product()">+ Add product</div>
 
-	<input type="submit" value="Create" onclick="submit_form(event)" />
+	<input type="submit" value="Create" />
 </form>
 
 <script>
 	const products = document.querySelector(".products-container");
 
-	function add_product() {
+	function add_product(first = false) {
 		const new_product = document.createElement("div");
 		new_product.className = "product-container";
 
@@ -48,28 +48,35 @@
 		product_qty.value = 1;
 		product_qty.required = true;
 		product_qty.min = 1;
-
+		
 		new_product.appendChild(product_sku);
 		new_product.appendChild(product_qty);
+		
+		if (!first) {
+			const delete_btn = document.createElement("div");
+			delete_btn.className = "delete-btn";
+			delete_btn.textContent = "Delete";
+			delete_btn.onclick = (e) => products.removeChild(new_product);
+			new_product.appendChild(delete_btn);
+		}
 
 		products.appendChild(new_product);
 	}
 
 	function submit_form(event) {
-		// prevent submiting the form
-		event.preventDefault();
+		const myForm = document.querySelector("#myForm");
 
-		if (!document.querySelector("#myForm").reportValidity()) return;
+		if (!myForm.reportValidity()) return;
 
-		// fetch all form data needed
-		const order_no = document.getElementById("order_no").value;
-		const cust_no = document.getElementById("cust_no").value;
-		const date = document.getElementById("date").value;
+		const formData = event.formData;
 
+		// fetch all products and stringify them
 		let products_array = [];
 		for (const element of products.children) {
 			const product_sku = element.firstChild;
-			const product_qty = element.lastChild;
+			const product_qty = element.children[1]
+
+			console.log(product_sku, product_qty)
 
 			products_array.push({
 				sku: product_sku.value,
@@ -77,26 +84,16 @@
 			});
 		}
 
-		fetch("/orders/create", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({
-				order_no: order_no,
-				cust_no: cust_no,
-				date: date,
-				products: products_array
-			})
-		})
-			.then(function (res) {
-				window.location.href = res.url;
-			})
-			.catch(function (res) {
-				console.log(res);
-			});
+		formData.set("products", JSON.stringify(products_array));
+
+		for (const entry of formData.entries()) {
+			console.log(entry)
+		}
+		
+		myForm.submit()
 	}
 
-	window.addEventListener("load", add_product);
+	window.addEventListener("load", () => add_product(first = true));
+	window.addEventListener("formdata", submit_form)
 </script>
 {% endblock %}

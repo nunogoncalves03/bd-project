@@ -2,6 +2,7 @@
 from logging.config import dictConfig
 
 import psycopg
+import json
 from flask import flash
 from flask import Flask
 from flask import jsonify
@@ -406,35 +407,37 @@ def orders_index():
 
     return render_template("orders/index.html", orders=orders)
 
-
 @app.route("/orders/create", methods=("GET", "POST"))
 def order_create():
     """Create a order."""
 
     if request.method == "POST":
-        body = request.json
+        order_no = request.form["order_no"]
+        cust_no = request.form["cust_no"]
+        date = request.form["date"]
+        products = json.loads(request.form["products"])
 
         error = ""
 
-        if not body["order_no"]:
+        if not order_no:
             error += "Order number is required. "
 
-            if not body["order_no"].isnumeric():
+            if not order_no.isnumeric():
                 error += "Order number is required to be numeric. "
 
-        if not body["cust_no"]:
+        if not cust_no:
             error += "Customer number is required. "
 
-            if not body["cust_no"].isnumeric():
+            if not cust_no.isnumeric():
                 error += "Customer number is required to be numeric. "
         
-        if not body["date"]:
+        if not date:
             error += "Date is required. "
 
-        if not body["products"] or len(body["products"]) == 0:
+        if not products or len(products) == 0:
             error += "Products are required. "
         else:
-            for product in body["products"]:
+            for product in products:
                 if not product["sku"] or not product["qty"]:
                     error += "Products are required. "
                     break
@@ -454,10 +457,10 @@ def order_create():
                             %(date)s
                             );
                         """,
-                        {"order_no": body["order_no"], "cust_no": body["cust_no"], "date": body["date"]},
+                        {"order_no": order_no, "cust_no": cust_no, "date": date},
                     )
 
-                    for product in body["products"]:
+                    for product in products:
                         cur.execute(
                             """
                             INSERT INTO contains(order_no, SKU, qty)
@@ -468,7 +471,7 @@ def order_create():
                                 %(qty)s
                                 );
                             """,
-                            {"order_no": body["order_no"], "SKU": product["sku"], "qty": product["qty"]},
+                            {"order_no": order_no, "SKU": product["sku"], "qty": product["qty"]},
                         )
 
                 conn.commit()
