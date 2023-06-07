@@ -92,7 +92,7 @@ def product_create():
             error += "Price is required. "
             if not price.isnumeric():
                 error += "Price is required to be numeric. "
-        
+
         if not ean:
             ean = None
 
@@ -113,14 +113,20 @@ def product_create():
                             %(ean)s
                             );
                         """,
-                        {"sku": sku, "name": name, "description": description, "price": price, "ean": ean},
+                        {
+                            "sku": sku,
+                            "name": name,
+                            "description": description,
+                            "price": price,
+                            "ean": ean,
+                        },
                     )
                 conn.commit()
             return redirect(url_for("products_index"))
 
     return render_template("products/create.html")
 
-    
+
 @app.route("/products/<sku>/update", methods=("GET", "POST"))
 def product_update(sku):
     """Update the product price and description."""
@@ -227,7 +233,7 @@ def supplier_create():
 
         if not tin:
             error += "TIN is required. "
-        
+
         if not name:
             name = None
 
@@ -236,7 +242,7 @@ def supplier_create():
 
         if not sku:
             sku = None
-        
+
         if not date:
             date = None
 
@@ -257,7 +263,13 @@ def supplier_create():
                             %(date)s
                             );
                         """,
-                        {"tin": tin, "name": name, "sku": sku, "address": address, "date": date},
+                        {
+                            "tin": tin,
+                            "name": name,
+                            "sku": sku,
+                            "address": address,
+                            "date": date,
+                        },
                     )
                 conn.commit()
             return redirect(url_for("suppliers_index"))
@@ -327,7 +339,7 @@ def customer_create():
 
             if not cust_no.isnumeric():
                 error += "Customer number is required to be numeric. "
-        
+
         if not name:
             error += "Name is required. "
 
@@ -336,7 +348,7 @@ def customer_create():
 
         if not phone:
             phone = None
-        
+
         if not address:
             address = None
 
@@ -357,7 +369,13 @@ def customer_create():
                             %(address)s
                             );
                         """,
-                        {"cust_no": cust_no, "name": name, "email": email, "phone": phone, "address": address},
+                        {
+                            "cust_no": cust_no,
+                            "name": name,
+                            "email": email,
+                            "phone": phone,
+                            "address": address,
+                        },
                     )
                 conn.commit()
             return redirect(url_for("customers_index"))
@@ -407,6 +425,43 @@ def orders_index():
 
     return render_template("orders/index.html", orders=orders)
 
+
+@app.route("/orders/<order_no>", methods=("GET",))
+def order_view(order_no):
+    """Show the order."""
+
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            order = cur.execute(
+                """
+                SELECT *
+                FROM orders
+                WHERE order_no = %(order_no)s;
+                """,
+                {"order_no": order_no},
+            ).fetchone()
+
+            products = cur.execute(
+                """
+                SELECT *
+                FROM contains
+                WHERE order_no = %(order_no)s;
+                """,
+                {"order_no": order_no},
+            ).fetchall()
+
+            log.debug(f"Found {cur.rowcount} rows.")
+
+    # API-like response is returned to clients that request JSON explicitly (e.g., fetch)
+    if (
+        request.accept_mimetypes["application/json"]
+        and not request.accept_mimetypes["text/html"]
+    ):
+        return jsonify({"order": order, "products": products})
+
+    return render_template("orders/view.html", order=order, products=products)
+
+
 @app.route("/orders/create", methods=("GET", "POST"))
 def order_create():
     """Create a order."""
@@ -430,7 +485,7 @@ def order_create():
 
             if not cust_no.isnumeric():
                 error += "Customer number is required to be numeric. "
-        
+
         if not date:
             error += "Date is required. "
 
@@ -471,7 +526,11 @@ def order_create():
                                 %(qty)s
                                 );
                             """,
-                            {"order_no": order_no, "SKU": product["sku"], "qty": product["qty"]},
+                            {
+                                "order_no": order_no,
+                                "SKU": product["sku"],
+                                "qty": product["qty"],
+                            },
                         )
 
                 conn.commit()

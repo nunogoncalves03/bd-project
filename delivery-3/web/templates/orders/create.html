@@ -2,98 +2,82 @@
 <h1>{% block title %}Place order{% endblock %}</h1>
 {% endblock %} {% block content %}
 <form id="myForm" method="post">
-	<label for="order_no">Order number</label>
-	<input
-		name="order_no"
-		id="order_no"
-		type="number"
-		value="{{ request.form['order_no'] }}"
-		required />
+    <label for="order_no">Order number</label>
+    <input name="order_no" id="order_no" type="number" value="{{ request.form['order_no'] }}" required />
 
-	<label for="cust_no">Customer number</label>
-	<input
-		name="cust_no"
-		id="cust_no"
-		type="number"
-		value="{{ request.form['cust_no'] }}"
-		required />
+    <label for="cust_no">Customer number</label>
+    <input name="cust_no" id="cust_no" type="number" value="{{ request.form['cust_no'] }}" required />
 
-	<label for="date">Date</label>
-	<input name="date" id="date" type="date" required />
+    <label for="date">Date</label>
+    <input name="date" id="date" type="date" required />
 
-	<label for="products-container">Products</label>
-	<div class="products-container"></div>
-	<div class="btn" onclick="add_product()">+ Add product</div>
+    <label for="products-container">Products</label>
+    <div class="products-container"></div>
+    <div class="btn" onclick="add_product()">+ Add product</div>
 
-	<input type="submit" value="Create" />
+    <input type="submit" value="Create" />
 </form>
 
 <script>
-	const products = document.querySelector(".products-container");
+    const products = document.querySelector(".products-container");
 
-	function add_product(first = false) {
-		const new_product = document.createElement("div");
-		new_product.className = "product-container";
+    function add_product(first = false) {
+        const new_product = document.createElement("div");
+        new_product.className = "product-container";
 
-		const product_sku = document.createElement("input");
-		product_sku.className = "product-sku";
-		product_sku.type = "text";
-		product_sku.placeholder = "SKUxxx";
-		product_sku.required = true;
+        const product_sku = document.createElement("input");
+        product_sku.className = "product-sku";
+        product_sku.type = "text";
+        product_sku.placeholder = "SKUxxx";
+        product_sku.required = true;
 
-		const product_qty = document.createElement("input");
-		product_qty.className = "product-qty";
-		product_qty.type = "number";
-		product_qty.placeholder = "1";
-		product_qty.value = 1;
-		product_qty.required = true;
-		product_qty.min = 1;
-		
-		new_product.appendChild(product_sku);
-		new_product.appendChild(product_qty);
-		
-		if (!first) {
-			const delete_btn = document.createElement("div");
-			delete_btn.className = "delete-btn";
-			delete_btn.textContent = "Delete";
-			delete_btn.onclick = (e) => products.removeChild(new_product);
-			new_product.appendChild(delete_btn);
-		}
+        const product_qty = document.createElement("input");
+        product_qty.className = "product-qty";
+        product_qty.type = "number";
+        product_qty.placeholder = "1";
+        product_qty.value = 1;
+        product_qty.required = true;
+        product_qty.min = 1;
 
-		products.appendChild(new_product);
-	}
+        new_product.appendChild(product_sku);
+        new_product.appendChild(product_qty);
 
-	function submit_form(event) {
-		const myForm = document.querySelector("#myForm");
+        if (!first) {
+            const delete_btn = document.createElement("div");
+            delete_btn.className = "delete-btn";
+            delete_btn.textContent = "Delete";
+            delete_btn.onclick = (e) => products.removeChild(new_product);
+            new_product.appendChild(delete_btn);
+        }
 
-		if (!myForm.reportValidity()) return;
+        products.appendChild(new_product);
+    }
 
-		const formData = event.formData;
+    function submit_form(event) {
+        const myForm = document.querySelector("#myForm");
 
-		// fetch all products and stringify them
-		let products_array = [];
-		for (const element of products.children) {
-			const product_sku = element.firstChild;
-			const product_qty = element.children[1]
+        if (!myForm.reportValidity()) return;
 
-			console.log(product_sku, product_qty)
+        const formData = event.formData;
 
-			products_array.push({
-				sku: product_sku.value,
-				qty: product_qty.value
-			});
-		}
+        // fetch all products and stringify them
+        let products_array = [];
+        for (const element of products.children) {
+            const product_sku = element.firstChild;
+            const product_qty = element.children[1]
 
-		formData.set("products", JSON.stringify(products_array));
+            products_array.push({
+                sku: product_sku.value,
+                qty: product_qty.value
+            });
+        }
 
-		for (const entry of formData.entries()) {
-			console.log(entry)
-		}
-		
-		myForm.submit()
-	}
+        formData.set("products", JSON.stringify(products_array));
 
-	window.addEventListener("load", () => add_product(first = true));
-	window.addEventListener("formdata", submit_form)
+        myForm.submit()
+    }
+
+    window.addEventListener("load", () => add_product(first = true));
+    window.addEventListener("formdata", submit_form)
 </script>
 {% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}{{ order['order_no'] }} | View{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="order_no">Order number</label>
+    <input name="order_no" id="order_no" type="text" value="{{ order['order_no'] }}" disabled>
+
+    <label for="cust_no">Customer number</label>
+    <input name="cust_no" id="cust_no" type="text" value="{{ order['cust_no'] }}" disabled>
+
+    <label for="date">Date</label>
+    <input name="date" id="date" type="date" value="{{ order['date'] }}" disabled>
+
+    <label for="products-container">Products</label>
+    <div class="products-container">
+        {% for product in products %}
+        <div class="product-container">
+            <input type="text" class="product-sku" value="{{ product['sku'] }}" disabled>
+            <input type="text" class="product-qty" value="{{ product['qty'] }}" disabled>
+        </div>
+        {% endfor %}
+    </div> 
+
+  </form>
+{% endblock %}

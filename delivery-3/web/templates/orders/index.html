@@ -8,6 +8,8 @@
 			<h1>{{ order['order_no'] }}</h1>
 			<div class="about">{{ order['cust_no'] }} - <b>{{ order['date'] }}</b></div>
 		</div>
+
+        <a class="action" href="{{ url_for('order_view', order_no=order['order_no']) }}">View</a>
 	</header>
 </article>
 {% if not loop.last %}
