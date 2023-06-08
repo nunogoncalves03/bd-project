@@ -3,15 +3,25 @@
 <a href="{{ url_for('order_create') }}">New</a>
 {% endblock %} {% block content %} {% for order in orders %}
 <article class="post">
-	<header>
-		<div>
-			<h1>{{ order['order_no'] }}</h1>
-			<div class="about">{{ order['cust_no'] }} - <b>{{ order['date'] }}</b></div>
-		</div>
-
+    <header>
+        <div>
+            <h1>{{ order['order_no'] }}</h1>
+            <div class="about">
+                {{ order['cust_no'] }} -
+                <b>{{ order['date'] }}</b>
+            </div>
+            <div class="body">
+                <label for="paid">Paid: {{ "Yes" if order['paid_by'] else "No"}}</label>
+            </div>
+        </div>
+        {% if not order['paid_by'] %}
+        <a class="action" id="paid" href="{{ url_for('order_pay', order_no=order['order_no']) }}">
+            Pay
+        </a>
+        {% endif %}
         <a class="action" href="{{ url_for('order_view', order_no=order['order_no']) }}">View</a>
-	</header>
+    </header>
 </article>
 {% if not loop.last %}
-<hr />
+<hr>
 {% endif %} {% endfor %} {% endblock %}

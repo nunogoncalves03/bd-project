@@ -13,9 +13,7 @@
             <h1>{{ product['name'] }}</h1>
             <div class="about">{{ product['sku'] }} - {{ product['ean'] if product['ean'] != None else 'NO EAN' }}</div>
         </div>
-
         <a class="action" href="{{ url_for('product_update', sku=product['sku']) }}">Edit</a>
-
         <form class="delete-form" action="{{ url_for('product_delete', sku=product['sku']) }}" method="post">
             <button class="delete-btn" onclick="return confirm('Are you sure?');">Delete</button>
         </form>

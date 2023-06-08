@@ -408,8 +408,13 @@ def orders_index():
         with conn.cursor(row_factory=namedtuple_row) as cur:
             orders = cur.execute(
                 """
-                SELECT *
-                FROM orders
+                SELECT
+                    o.order_no,
+                    o.cust_no,
+                    o.date,
+                    p.cust_no AS paid_by
+                FROM orders o
+                LEFT JOIN pay p USING (order_no)
                 ORDER BY date DESC;
                 """,
                 {},
@@ -434,9 +439,14 @@ def order_view(order_no):
         with conn.cursor(row_factory=namedtuple_row) as cur:
             order = cur.execute(
                 """
-                SELECT *
-                FROM orders
-                WHERE order_no = %(order_no)s;
+                SELECT
+                    o.order_no,
+                    o.cust_no,
+                    o.date,
+                    p.cust_no AS paid_by
+                FROM orders o
+                LEFT JOIN pay p USING (order_no)
+                WHERE o.order_no = %(order_no)s;
                 """,
                 {"order_no": order_no},
             ).fetchone()
@@ -460,6 +470,53 @@ def order_view(order_no):
         return jsonify({"order": order, "products": products})
 
     return render_template("orders/view.html", order=order, products=products)
+
+
+@app.route(
+    "/orders/<order_no>/pay",
+    methods=(
+        "GET",
+        "POST",
+    ),
+)
+def order_pay(order_no):
+    """Pay the order."""
+
+    if request.method == "POST":
+        paid_by = request.form["paid_by"]
+
+        error = ""
+
+        if not paid_by:
+            error += "Order number is required. "
+
+            if not paid_by.isnumeric():
+                error += "Order number is required to be numeric. "
+
+        if error != "":
+            flash(error)
+        else:
+            with pool.connection() as conn:
+                with conn.cursor(row_factory=namedtuple_row) as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO pay(order_no, cust_no)
+                        VALUES
+                            (
+                            %(order_no)s,
+                            %(paid_by)s
+                            );
+                        """,
+                        {"order_no": order_no, "paid_by": paid_by},
+                    )
+
+                    log.debug(f"Found {cur.rowcount} rows.")
+
+                conn.commit()
+
+            return redirect(url_for("order_view", order_no=order_no))
+
+    return render_template("orders/pay.html", order_no=order_no)
 
 
 @app.route("/orders/create", methods=("GET", "POST"))

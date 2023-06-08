@@ -3,21 +3,33 @@
 {% endblock %} {% block content %}
 <form id="myForm" method="post">
     <label for="order_no">Order number</label>
-    <input name="order_no" id="order_no" type="number" value="{{ request.form['order_no'] }}" required />
-
+    <input
+        name="order_no"
+        id="order_no"
+        type="number"
+        value="{{ request.form['order_no'] }}"
+        required
+    >
     <label for="cust_no">Customer number</label>
-    <input name="cust_no" id="cust_no" type="number" value="{{ request.form['cust_no'] }}" required />
-
+    <input
+        name="cust_no"
+        id="cust_no"
+        type="number"
+        value="{{ request.form['cust_no'] }}"
+        required
+    >
     <label for="date">Date</label>
-    <input name="date" id="date" type="date" required />
-
+    <input
+        name="date"
+        id="date"
+        type="date"
+        required
+    >
     <label for="products-container">Products</label>
     <div class="products-container"></div>
     <div class="btn" onclick="add_product()">+ Add product</div>
-
-    <input type="submit" value="Create" />
+    <input type="submit" value="Create">
 </form>
-
 <script>
     const products = document.querySelector(".products-container");
 

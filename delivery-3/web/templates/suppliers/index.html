@@ -13,12 +13,13 @@
             <h1>{{ supplier['tin'] }}</h1>
             <div class="about">{{ supplier['name'] if supplier['name'] else "NO NAME" }} - {{ supplier['address'] if supplier['address'] != None else 'NO ADDRESS' }}</div>
         </div>
-
         <form class="delete-form" action="{{ url_for('supplier_delete', tin=supplier['tin']) }}" method="post">
             <button class="delete-btn" onclick="return confirm('Are you sure?');">Delete</button>
         </form>
     </header>
-    <p class="body">Product supplied: <b>{{ supplier['sku'] if supplier['sku'] != None else 'NA' }}</b></p>
+    <p class="body">Product supplied:
+        <b>{{ supplier['sku'] if supplier['sku'] != None else 'NA' }}</b>
+    </p>
     <p class="body">{{ supplier['date'] if supplier['date'] else "NO DATE"}}</p>
 </article>
 {% if not loop.last %}

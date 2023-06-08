@@ -1,23 +1,31 @@
 <!DOCTYPE html>
 <title>{% block title %}{% endblock %} - E-commerce</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-	href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap"
-	rel="stylesheet" />
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 <nav>
-	<h1><a href="/">E-commerce</a></h1>
-	<ul>
-		<li><a href="{{ url_for('customers_index') }}">Customers</a></li>
-		<li><a href="{{ url_for('orders_index') }}">Orders</a></li>
-		<li><a href="{{ url_for('products_index') }}">Products</a></li>
-		<li><a href="{{ url_for('suppliers_index') }}">Suppliers</a></li>
-	</ul>
+    <h1>
+        <a href="/">E-commerce</a>
+    </h1>
+    <ul>
+        <li>
+            <a href="{{ url_for('customers_index') }}">Customers</a>
+        </li>
+        <li>
+            <a href="{{ url_for('orders_index') }}">Orders</a>
+        </li>
+        <li>
+            <a href="{{ url_for('products_index') }}">Products</a>
+        </li>
+        <li>
+            <a href="{{ url_for('suppliers_index') }}">Suppliers</a>
+        </li>
+    </ul>
 </nav>
 <section class="content">
-	<header>{% block header %}{% endblock %}</header>
-	{% for message in get_flashed_messages() %}
-	<div class="flash">{{ message }}</div>
-	{% endfor %} {% block content %}{% endblock %}
+    <header>{% block header %}{% endblock %}</header>
+    {% for message in get_flashed_messages() %}
+    <div class="flash">{{ message }}</div>
+    {% endfor %} {% block content %}{% endblock %}
 </section>
