@@ -44,20 +44,43 @@ log = app.logger
 
 
 @app.route("/products", methods=("GET",))
-def products_index():
+@app.route("/products/<page>", methods=("GET",))
+def products_index(page=0):
     """Show all the products, ordered by name."""
+
+    page = int(page)
+
+    if page < 0:
+        return redirect(url_for("products_index"))
 
     with pool.connection() as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
-            products = cur.execute(
-                """
+            query = """
                 SELECT *
                 FROM product
-                ORDER BY name ASC;
-                """,
-                {},
+                ORDER BY name ASC
+                OFFSET %(page)s
+                LIMIT 10;
+            """
+
+            products = cur.execute(
+                query,
+                {"page": page * 10},
             ).fetchall()
+
             log.debug(f"Found {cur.rowcount} rows.")
+
+            if cur.rowcount == 0:
+                return redirect(url_for("products_index"))
+
+            cur.execute(
+                query,
+                {"page": (page + 1) * 10},
+            ).fetchall()
+
+            log.debug(f"Found {cur.rowcount} rows.")
+
+            last = True if cur.rowcount == 0 else False
 
     # API-like response is returned to clients that request JSON explicitly (e.g., fetch)
     if (
@@ -66,7 +89,9 @@ def products_index():
     ):
         return jsonify(products)
 
-    return render_template("products/index.html", products=products)
+    return render_template(
+        "products/index.html", products=products, page=page, last=last
+    )
 
 
 @app.route("/products/create", methods=("GET", "POST"))
@@ -90,11 +115,13 @@ def product_create():
 
         if not price:
             error += "Price is required. "
-            if not price.isnumeric():
-                error += "Price is required to be numeric. "
+        elif not price.isnumeric():
+            error += "Price is required to be numeric. "
 
         if not ean:
             ean = None
+        elif not ean.isnumeric():
+            error += "EAN is required to be numeric. "
 
         if error != "":
             flash(error)
@@ -151,8 +178,8 @@ def product_update(sku):
 
         if not price:
             error += "Price is required. "
-            if not price.isnumeric():
-                error += "Price is required to be numeric. "
+        elif not price.isnumeric():
+            error += "Price is required to be numeric. "
 
         if error != "":
             flash(error)
@@ -193,20 +220,43 @@ def product_delete(sku):
 
 
 @app.route("/suppliers", methods=("GET",))
-def suppliers_index():
+@app.route("/suppliers/<page>", methods=("GET",))
+def suppliers_index(page=0):
     """Show all the suppliers, ordered by TIN."""
+
+    page = int(page)
+
+    if page < 0:
+        return redirect(url_for("suppliers_index"))
 
     with pool.connection() as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
-            suppliers = cur.execute(
-                """
+            query = """
                 SELECT *
                 FROM supplier
-                ORDER BY TIN ASC;
-                """,
-                {},
+                ORDER BY TIN ASC
+                OFFSET %(page)s
+                LIMIT 10;
+            """
+
+            suppliers = cur.execute(
+                query,
+                {"page": page * 10},
             ).fetchall()
+
             log.debug(f"Found {cur.rowcount} rows.")
+
+            if cur.rowcount == 0:
+                return redirect(url_for("suppliers_index"))
+
+            cur.execute(
+                query,
+                {"page": (page + 1) * 10},
+            ).fetchall()
+
+            log.debug(f"Found {cur.rowcount} rows.")
+
+            last = True if cur.rowcount == 0 else False
 
     # API-like response is returned to clients that request JSON explicitly (e.g., fetch)
     if (
@@ -215,7 +265,9 @@ def suppliers_index():
     ):
         return jsonify(suppliers)
 
-    return render_template("suppliers/index.html", suppliers=suppliers)
+    return render_template(
+        "suppliers/index.html", suppliers=suppliers, page=page, last=last
+    )
 
 
 @app.route("/suppliers/create", methods=("GET", "POST"))
@@ -296,20 +348,43 @@ def supplier_delete(tin):
 
 @app.route("/", methods=("GET",))
 @app.route("/customers", methods=("GET",))
-def customers_index():
+@app.route("/customers/<page>", methods=("GET",))
+def customers_index(page=0):
     """Show all the customers, ordered by name."""
+
+    page = int(page)
+
+    if page < 0:
+        return redirect(url_for("customers_index"))
 
     with pool.connection() as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
-            customers = cur.execute(
-                """
+            query = """
                 SELECT *
                 FROM customer
-                ORDER BY name ASC;
-                """,
-                {},
+                ORDER BY name ASC
+                OFFSET %(page)s
+                LIMIT 10;
+            """
+
+            customers = cur.execute(
+                query,
+                {"page": page * 10},
             ).fetchall()
+
             log.debug(f"Found {cur.rowcount} rows.")
+
+            if cur.rowcount == 0:
+                return redirect(url_for("customers_index"))
+
+            cur.execute(
+                query,
+                {"page": (page + 1) * 10},
+            ).fetchall()
+
+            log.debug(f"Found {cur.rowcount} rows.")
+
+            last = True if cur.rowcount == 0 else False
 
     # API-like response is returned to clients that request JSON explicitly (e.g., fetch)
     if (
@@ -318,7 +393,9 @@ def customers_index():
     ):
         return jsonify(customers)
 
-    return render_template("customers/index.html", customers=customers)
+    return render_template(
+        "customers/index.html", customers=customers, page=page, last=last
+    )
 
 
 @app.route("/customers/create", methods=("GET", "POST"))
@@ -336,9 +413,8 @@ def customer_create():
 
         if not cust_no:
             error += "Customer number is required. "
-
-            if not cust_no.isnumeric():
-                error += "Customer number is required to be numeric. "
+        elif not cust_no.isnumeric():
+            error += "Customer number is required to be numeric. "
 
         if not name:
             error += "Name is required. "
@@ -401,25 +477,48 @@ def customer_delete(cust_no):
 
 
 @app.route("/orders", methods=("GET",))
-def orders_index():
+@app.route("/orders/<page>", methods=("GET",))
+def orders_index(page=0):
     """Show all the orders, most recent first."""
+
+    page = int(page)
+
+    if page < 0:
+        return redirect(url_for("orders_index"))
 
     with pool.connection() as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
+            query = """
+                    SELECT
+                        o.order_no,
+                        o.cust_no,
+                        o.date,
+                        p.cust_no AS paid_by
+                    FROM orders o
+                    LEFT JOIN pay p USING (order_no)
+                    ORDER BY date DESC
+                    OFFSET %(page)s
+                    LIMIT 10;
+            """
+
             orders = cur.execute(
-                """
-                SELECT
-                    o.order_no,
-                    o.cust_no,
-                    o.date,
-                    p.cust_no AS paid_by
-                FROM orders o
-                LEFT JOIN pay p USING (order_no)
-                ORDER BY date DESC;
-                """,
-                {},
+                query,
+                {"page": page * 10},
             ).fetchall()
+
             log.debug(f"Found {cur.rowcount} rows.")
+
+            if cur.rowcount == 0:
+                return redirect(url_for("orders_index"))
+
+            cur.execute(
+                query,
+                {"page": (page + 1) * 10},
+            ).fetchall()
+
+            log.debug(f"Found {cur.rowcount} rows.")
+
+            last = True if cur.rowcount == 0 else False
 
     # API-like response is returned to clients that request JSON explicitly (e.g., fetch)
     if (
@@ -428,10 +527,15 @@ def orders_index():
     ):
         return jsonify(orders)
 
-    return render_template("orders/index.html", orders=orders)
+    return render_template(
+        "orders/index.html",
+        orders=orders,
+        page=page,
+        last=last,
+    )
 
 
-@app.route("/orders/<order_no>", methods=("GET",))
+@app.route("/orders/view/<order_no>", methods=("GET",))
 def order_view(order_no):
     """Show the order."""
 
@@ -489,9 +593,8 @@ def order_pay(order_no):
 
         if not paid_by:
             error += "Order number is required. "
-
-            if not paid_by.isnumeric():
-                error += "Order number is required to be numeric. "
+        elif not paid_by.isnumeric():
+            error += "Order number is required to be numeric. "
 
         if error != "":
             flash(error)
@@ -533,15 +636,13 @@ def order_create():
 
         if not order_no:
             error += "Order number is required. "
-
-            if not order_no.isnumeric():
-                error += "Order number is required to be numeric. "
+        elif not order_no.isnumeric():
+            error += "Order number is required to be numeric. "
 
         if not cust_no:
             error += "Customer number is required. "
-
-            if not cust_no.isnumeric():
-                error += "Customer number is required to be numeric. "
+        elif not cust_no.isnumeric():
+            error += "Customer number is required to be numeric. "
 
         if not date:
             error += "Date is required. "

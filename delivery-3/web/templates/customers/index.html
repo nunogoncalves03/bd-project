@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'index_base.html' %}
 
 {% block header %}
 <h1>{% block title %}Customers{% endblock %}</h1>
@@ -23,8 +23,9 @@
     <p class="body">Phone number: {{ customer['phone'] if customer['phone'] != None else 'NA' }}</p>
     <p class="body">Address: {{ customer['address'] if customer['address'] else 'NA'}}</p>
 </article>
-{% if not loop.last %}
 <hr>
-{% endif %}
 {% endfor %}
 {% endblock %}
+
+{% block prev_url %}{{ url_for('customers_index', page=page - 1) }}{% endblock %}
+{% block next_url %}{{ url_for('customers_index', page=page + 1) }}{% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'index_base.html' %}
 
 {% block header %}
 <h1>{% block title %}Products{% endblock %}</h1>
@@ -21,8 +21,9 @@
     <p class="highlight">{{ product['price'] }} €</p>
     <p class="body">{{ product['description'] if product['description'] != None else '' }}</p>
 </article>
-{% if not loop.last %}
 <hr>
-{% endif %}
 {% endfor %}
 {% endblock %}
+
+{% block prev_url %}{{ url_for('products_index', page=page - 1) }}{% endblock %}
+{% block next_url %}{{ url_for('products_index', page=page + 1) }}{% endblock %}

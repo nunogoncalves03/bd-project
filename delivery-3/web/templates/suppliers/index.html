@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'index_base.html' %}
 
 {% block header %}
 <h1>{% block title %}Suppliers{% endblock %}</h1>
@@ -17,13 +17,15 @@
             <button class="delete-btn" onclick="return confirm('Are you sure?');">Delete</button>
         </form>
     </header>
-    <p class="body">Product supplied:
+    <p class="body">
+        Product supplied:
         <b>{{ supplier['sku'] if supplier['sku'] != None else 'NA' }}</b>
     </p>
     <p class="body">{{ supplier['date'] if supplier['date'] else "NO DATE"}}</p>
 </article>
-{% if not loop.last %}
 <hr>
-{% endif %}
 {% endfor %}
 {% endblock %}
+
+{% block prev_url %}{{ url_for('suppliers_index', page=page - 1) }}{% endblock %}
+{% block next_url %}{{ url_for('suppliers_index', page=page + 1) }}{% endblock %}

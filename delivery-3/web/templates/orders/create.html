@@ -7,6 +7,7 @@
         name="order_no"
         id="order_no"
         type="number"
+        min="0"
         value="{{ request.form['order_no'] }}"
         required
     >
@@ -15,6 +16,7 @@
         name="cust_no"
         id="cust_no"
         type="number"
+        min="0"
         value="{{ request.form['cust_no'] }}"
         required
     >

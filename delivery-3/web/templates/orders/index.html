@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% block header %}
+{% extends 'index_base.html' %} {% block header %}
 <h1>{% block title %}Orders{% endblock %}</h1>
 <a href="{{ url_for('order_create') }}">New</a>
 {% endblock %} {% block content %} {% for order in orders %}
@@ -22,6 +22,11 @@
         <a class="action" href="{{ url_for('order_view', order_no=order['order_no']) }}">View</a>
     </header>
 </article>
-{% if not loop.last %}
 <hr>
-{% endif %} {% endfor %} {% endblock %}
+{% endfor %}
+
+{% endblock %}
+
+
+{% block prev_url %}{{ url_for('orders_index', page=page - 1) }}{% endblock %}
+{% block next_url %}{{ url_for('orders_index', page=page + 1) }}{% endblock %}

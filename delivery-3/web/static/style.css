@@ -173,3 +173,9 @@ form.delete-form {
 .paid-container > a {
   padding: 0 0 0 0.6rem;
 }
+
+footer {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}

@@ -43,7 +43,8 @@
     <input
         name="ean"
         id="ean"
-        type="text"
+        type="number"
+        min="0"
         value="{{ request.form['ean'] }}"
     >
     <input type="submit" value="Create">
