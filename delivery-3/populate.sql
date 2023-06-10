@@ -38,6 +38,13 @@ SELECT
     generate_series(377, 383),
     generate_series('2022-01-01'::TIMESTAMP, '2022-12-31'::TIMESTAMP, '60 day'),
     1;
+    
+-- OLAP
+INSERT INTO orders (order_no, "date", cust_no)
+SELECT
+    generate_series(384, 748),
+    generate_series('2022-01-01'::TIMESTAMP, '2022-12-31'::TIMESTAMP, '1 day'),
+    2;
 
 INSERT INTO pay (order_no, cust_no)
 VALUES
@@ -53,6 +60,12 @@ INSERT INTO pay (order_no, cust_no)
 SELECT
     generate_series(12, 376),
     1;
+
+-- OLAP
+INSERT INTO pay (order_no, cust_no)
+SELECT
+    generate_series(384, 748),
+    2;
 
 INSERT INTO employee (ssn, tin, bdate, "name")
 VALUES
@@ -88,6 +101,12 @@ INSERT INTO process (ssn, order_no)
 SELECT
     '123-45-6789',
     generate_series(12, 376);
+
+-- OLAP
+INSERT INTO process (ssn, order_no)
+SELECT
+    '678-90-1234',
+    generate_series(384, 748);
 
 
 INSERT INTO department ("name")
@@ -179,6 +198,13 @@ SELECT
     generate_series(377, 383),
     'SKU111',
     1;
+
+-- OLAP
+INSERT INTO contains (order_no, sku, qty)
+SELECT
+    generate_series(384, 748),
+    'SKU222',
+    2;
 
 INSERT INTO supplier (tin, "name", "address", sku, "date")
 VALUES
