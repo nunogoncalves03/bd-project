@@ -46,6 +46,13 @@ SELECT
     generate_series('2022-01-01'::TIMESTAMP, '2022-12-31'::TIMESTAMP, '1 day'),
     2;
 
+-- section 6
+-- INSERT INTO orders (order_no, "date", cust_no)
+-- SELECT
+--     generate_series(749, 81101),
+--     generate_series('1800-01-01'::TIMESTAMP, '2019-12-31'::TIMESTAMP, '1 day'),
+--     3;
+
 INSERT INTO pay (order_no, cust_no)
 VALUES
     (1,1),
@@ -160,6 +167,20 @@ VALUES
     ('SKU444', 'Product 4', 'This is the description of product 4.', 64.99, NULL),
     ('SKU555', 'Product 5', 'This is the description of product 5.', 89.99, NULL);
 
+-- section 6
+-- INSERT INTO product (sku, "name", "description", price, ean)
+-- SELECT
+--     generate_series(1, 500000),
+--     CASE 
+--         WHEN random() < 0.50 THEN 'A11111111'
+--         ELSE 'B'
+--     END,
+--     NULL,
+--     CASE 
+--         WHEN random() < 0.50 THEN 20
+--         ELSE 60
+--     END,
+--     NULL;
 
 INSERT INTO contains (order_no, sku, qty)
 VALUES
@@ -205,6 +226,20 @@ SELECT
     generate_series(384, 748),
     'SKU222',
     2;
+
+-- section 6
+-- INSERT INTO contains (order_no, sku, qty)
+-- SELECT
+--     generate_series(749, 81101),
+--     (random() * (500000 - 1) + 1)::INTEGER,
+--     2;
+
+-- section 6
+-- INSERT INTO contains (order_no, sku, qty)
+-- SELECT
+--     (random() * (11 - 5 - 1) + 5)::INTEGER,
+--     generate_series(1, 500000),
+--     2;
 
 INSERT INTO supplier (tin, "name", "address", sku, "date")
 VALUES
