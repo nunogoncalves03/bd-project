@@ -70,7 +70,7 @@ def products_index(page=0):
 
             log.debug(f"Found {cur.rowcount} rows.")
 
-            if cur.rowcount == 0:
+            if cur.rowcount == 0 and page != 0:
                 return redirect(url_for("products_index"))
 
             cur.execute(
@@ -170,6 +170,9 @@ def product_update(sku):
             ).fetchone()
             log.debug(f"Found {cur.rowcount} rows.")
 
+            if product == None:
+                return redirect(url_for("products_index"))
+
     if request.method == "POST":
         price = request.form["price"]
         description = request.form["description"]
@@ -246,7 +249,7 @@ def suppliers_index(page=0):
 
             log.debug(f"Found {cur.rowcount} rows.")
 
-            if cur.rowcount == 0:
+            if cur.rowcount == 0 and page != 0:
                 return redirect(url_for("suppliers_index"))
 
             cur.execute(
@@ -374,7 +377,7 @@ def customers_index(page=0):
 
             log.debug(f"Found {cur.rowcount} rows.")
 
-            if cur.rowcount == 0:
+            if cur.rowcount == 0 and page != 0:
                 return redirect(url_for("customers_index"))
 
             cur.execute(
@@ -508,7 +511,7 @@ def orders_index(page=0):
 
             log.debug(f"Found {cur.rowcount} rows.")
 
-            if cur.rowcount == 0:
+            if cur.rowcount == 0 and page != 0:
                 return redirect(url_for("orders_index"))
 
             cur.execute(
@@ -555,6 +558,9 @@ def order_view(order_no):
                 {"order_no": order_no},
             ).fetchone()
 
+            if order == None:
+                return redirect(url_for("orders_index"))
+            
             products = cur.execute(
                 """
                 SELECT *
@@ -618,6 +624,19 @@ def order_pay(order_no):
                 conn.commit()
 
             return redirect(url_for("order_view", order_no=order_no))
+
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            order = cur.execute(
+                """
+                SELECT * FROM orders
+                WHERE order_no = %(order_no)s;
+                """,
+                {"order_no": order_no},
+            ).fetchone()
+
+    if order == None:
+        return redirect(url_for("orders_index"))
 
     return render_template("orders/pay.html", order_no=order_no)
 
