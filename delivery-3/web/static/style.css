@@ -1,5 +1,5 @@
 html {
-  background: var(--cinza-4);
+  background-color: var(--cinza-4);
   --blue: #377ba8;
   --light-blue: #4baff2;
   --dark-blue: #25587a;
@@ -199,15 +199,9 @@ input#paid_by {
   outline: none;
 }
 
-/* remove? */
 .delete-btn {
   background: none;
   border: none;
-  display: inline;
-  color: #377ba8;
-  text-decoration: underline;
-  padding: 0.5rem;
-  cursor: pointer;
 }
 
 form.delete-form {

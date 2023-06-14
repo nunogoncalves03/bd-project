@@ -22,7 +22,9 @@
             <i class="bi bi-pencil-fill edit-btn"></i>
         </a>
         <form class="delete-form" action="{{ url_for('product_delete', sku=product['sku']) }}" method="post">
-            <i class="bi bi-trash3-fill trash-btn" onclick="return confirm('Are you sure?')"></i>
+            <button class="delete-btn">
+                <i class="bi bi-trash3-fill trash-btn" onclick="return confirm('Are you sure?')"></i>
+            </button>
         </form>
     </header>
     <p class="highlight">{{ product['price'] }} €</p>

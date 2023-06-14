@@ -148,7 +148,7 @@ def product_create():
                             "ean": ean,
                         },
                     )
-                conn.commit()
+
             return redirect(url_for("products_index"))
 
     return render_template("products/create.html")
@@ -199,7 +199,7 @@ def product_update(sku):
                         """,
                         {"sku": sku, "price": price, "description": description},
                     )
-                conn.commit()
+
             return redirect(url_for("products_index"))
 
     return render_template("products/update.html", product=product)
@@ -213,12 +213,83 @@ def product_delete(sku):
         with conn.cursor(row_factory=namedtuple_row) as cur:
             cur.execute(
                 """
+                UPDATE supplier
+                SET
+                    SKU = NULL
+                WHERE SKU = %(sku)s;
+                """,
+                {"sku": sku},
+            )
+
+            cur.execute(
+                """
+                WITH orders_to_be_deleted AS (
+                    SELECT
+                        c.order_no
+                    FROM
+                        contains c
+                    WHERE SKU = %(sku)s
+                        AND (SELECT COUNT(*) FROM contains WHERE order_no = c.order_no) = 1
+                )
+                DELETE FROM contains
+                WHERE SKU = %(sku)s
+                    AND order_no NOT IN (SELECT order_no FROM orders_to_be_deleted);
+                """,
+                {"sku": sku},
+            )
+
+            orders = cur.execute(
+                """
+                SELECT
+                    c.order_no
+                FROM
+                    contains c
+                WHERE SKU = %(sku)s
+                    AND (SELECT COUNT(*) FROM contains WHERE order_no = c.order_no) = 1;
+                """,
+                {"sku": sku},
+            ).fetchall()
+
+            for order in orders:
+                order_no = order[0]
+
+                cur.execute(
+                    """
+                    DELETE FROM pay
+                    WHERE order_no = %(order_no)s;
+                    """,
+                    {"order_no": order_no},
+                )
+                cur.execute(
+                    """
+                    DELETE FROM process
+                    WHERE order_no = %(order_no)s;
+                    """,
+                    {"order_no": order_no},
+                )
+                cur.execute(
+                    """
+                    DELETE FROM contains
+                    WHERE order_no = %(order_no)s;
+                    """,
+                    {"order_no": order_no},
+                )
+                cur.execute(
+                    """
+                    DELETE FROM orders
+                    WHERE order_no = %(order_no)s;
+                    """,
+                    {"order_no": order_no},
+                )
+
+            cur.execute(
+                """
                 DELETE FROM product
                 WHERE SKU = %(sku)s;
                 """,
                 {"sku": sku},
             )
-        conn.commit()
+
     return redirect(url_for("products_index"))
 
 
@@ -326,7 +397,7 @@ def supplier_create():
                             "date": date,
                         },
                     )
-                conn.commit()
+
             return redirect(url_for("suppliers_index"))
 
     return render_template("suppliers/create.html")
@@ -340,12 +411,20 @@ def supplier_delete(tin):
         with conn.cursor(row_factory=namedtuple_row) as cur:
             cur.execute(
                 """
+                DELETE FROM delivery
+                WHERE TIN = %(tin)s;
+                """,
+                {"tin": tin},
+            )
+
+            cur.execute(
+                """
                 DELETE FROM supplier
                 WHERE TIN = %(tin)s;
                 """,
                 {"tin": tin},
             )
-        conn.commit()
+
     return redirect(url_for("suppliers_index"))
 
 
@@ -456,7 +535,7 @@ def customer_create():
                             "address": address,
                         },
                     )
-                conn.commit()
+
             return redirect(url_for("customers_index"))
 
     return render_template("customers/create.html")
@@ -468,6 +547,49 @@ def customer_delete(cust_no):
 
     with pool.connection() as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
+            orders = cur.execute(
+                """
+                SELECT
+                    order_no
+                FROM
+                    orders
+                WHERE cust_no = %(cust_no)s;
+                """,
+                {"cust_no": cust_no},
+            ).fetchall()
+
+            for order in orders:
+                order_no = order[0]
+
+                cur.execute(
+                    """
+                    DELETE FROM pay
+                    WHERE order_no = %(order_no)s;
+                    """,
+                    {"order_no": order_no},
+                )
+                cur.execute(
+                    """
+                    DELETE FROM process
+                    WHERE order_no = %(order_no)s;
+                    """,
+                    {"order_no": order_no},
+                )
+                cur.execute(
+                    """
+                    DELETE FROM contains
+                    WHERE order_no = %(order_no)s;
+                    """,
+                    {"order_no": order_no},
+                )
+                cur.execute(
+                    """
+                    DELETE FROM orders
+                    WHERE order_no = %(order_no)s;
+                    """,
+                    {"order_no": order_no},
+                )
+
             cur.execute(
                 """
                 DELETE FROM customer
@@ -475,7 +597,7 @@ def customer_delete(cust_no):
                 """,
                 {"cust_no": cust_no},
             )
-        conn.commit()
+
     return redirect(url_for("customers_index"))
 
 
@@ -621,8 +743,6 @@ def order_pay(order_no):
 
                     log.debug(f"Found {cur.rowcount} rows.")
 
-                conn.commit()
-
             return redirect(url_for("order_view", order_no=order_no))
 
     with pool.connection() as conn:
@@ -710,7 +830,6 @@ def order_create():
                             },
                         )
 
-                conn.commit()
             return redirect(url_for("orders_index"))
 
     return render_template("orders/create.html")
