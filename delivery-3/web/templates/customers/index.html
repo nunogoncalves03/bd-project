@@ -21,14 +21,16 @@
             </div>
         </div>
         <form class="delete-form" action="{{ url_for('customer_delete', cust_no=customer['cust_no']) }}" method="post">
-            <i class="bi bi-trash3-fill trash-btn" onclick="return confirm('Are you sure?')" ></i>
+            <i class="bi bi-trash3-fill trash-btn" onclick="return confirm('Are you sure?')"></i>
         </form>
     </header>
     <p class="body">E-mail: {{ customer['email'] }}</p>
     <p class="body">Phone number: {{ customer['phone'] if customer['phone'] != None else 'NA' }}</p>
     <p class="body">Address: {{ customer['address'] if customer['address'] else 'NA'}}</p>
 </article>
+{% if not loop.last %}
 <hr>
+{% endif %}
 {% endfor %}
 {% endblock %}
 

@@ -560,7 +560,7 @@ def order_view(order_no):
 
             if order == None:
                 return redirect(url_for("orders_index"))
-            
+
             products = cur.execute(
                 """
                 SELECT *
@@ -598,9 +598,9 @@ def order_pay(order_no):
         error = ""
 
         if not paid_by:
-            error += "Order number is required. "
+            error += "Customer number is required. "
         elif not paid_by.isnumeric():
-            error += "Order number is required to be numeric. "
+            error += "Customer number is required to be numeric. "
 
         if error != "":
             flash(error)
@@ -638,7 +638,7 @@ def order_pay(order_no):
     if order == None:
         return redirect(url_for("orders_index"))
 
-    return render_template("orders/pay.html", order_no=order_no)
+    return render_template("orders/pay.html", order=order)
 
 
 @app.route("/orders/create", methods=("GET", "POST"))

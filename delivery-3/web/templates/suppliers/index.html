@@ -5,7 +5,7 @@
 {% block header %}
 <h1>{% block title %}Suppliers{% endblock %}</h1>
 <a class="btn icon-btn" href="{{ url_for('supplier_create') }}">
-    <i class="bi bi-plus-lg plus-icon"></i>    
+    <i class="bi bi-plus-lg plus-icon"></i>
     New
 </a>
 {% endblock %}
@@ -19,7 +19,7 @@
             <div class="about">{{ supplier['name'] if supplier['name'] else "NO NAME" }} - {{ supplier['address'] if supplier['address'] != None else 'NO ADDRESS' }}</div>
         </div>
         <form class="delete-form" action="{{ url_for('supplier_delete', tin=supplier['tin']) }}" method="post">
-            <i class="bi bi-trash3-fill trash-btn" onclick="return confirm('Are you sure?')" ></i>
+            <i class="bi bi-trash3-fill trash-btn" onclick="return confirm('Are you sure?')"></i>
         </form>
     </header>
     <p class="body">
@@ -28,7 +28,9 @@
     </p>
     <p class="body">{{ supplier['date'] if supplier['date'] else "NO DATE"}}</p>
 </article>
+{% if not loop.last %}
 <hr>
+{% endif %}
 {% endfor %}
 {% endblock %}
 

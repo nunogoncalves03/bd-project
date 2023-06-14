@@ -5,7 +5,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-{#<nav>
+{#
+<nav>
     <h1>
         <a href="/">E-commerce</a>
     </h1>
@@ -23,18 +24,17 @@
             <a href="{{ url_for('suppliers_index') }}">Suppliers</a>
         </li>
     </ul>
-</nav> #}
-
+</nav>
+#}
 <aside>
     <div class="Sidebar">
-        <div class="nav-item" id="logo">
+        <a href="/" class="nav-item" id="logo">
             E-commerce
-        </div>
+        </a>
         <a href="{{ url_for('customers_index') }}" class="nav-item {% block customers_active %}{% endblock %}">
             <i class="bi bi-person-badge-fill"></i>
             Customers
         </a>
-
         <a href="{{ url_for('orders_index') }}" class="nav-item {% block orders_active %}{% endblock %}">
             <i class="bi bi-cart-fill"></i>
             Orders
