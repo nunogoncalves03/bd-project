@@ -1,16 +1,38 @@
 html {
-  font-family: sans-serif;
-  background: #eee;
-  padding: 1rem;
+  background: var(--cinza-4);
+  --blue: #377ba8;
+  --light-blue: #4baff2;
+  --dark-blue: #25587a;
+  --red: #F21313;
+  --cinza-1: #212121;
+  --cinza-2: #252525;
+  --cinza-3: #2C2C2C;
+  --cinza-4: #333333;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+i {
+    font-size: inherit;
 }
 
 body {
-  max-width: 960px;
-  margin: 0 auto;
-  background: white;
+  background-color: var(--cinza-4);
   font-family: "Roboto", sans-serif;
+  color: white;
 }
 
+/* remove? */
 h1,
 h2,
 h3,
@@ -18,62 +40,55 @@ h4,
 h5,
 h6 {
   color: #377ba8;
-  margin: 1rem 0;
-}
-
-a {
-  color: #377ba8;
+  margin: 0rem 0;
 }
 
 hr {
   border: none;
-  border-top: 1px solid lightgray;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 1rem 0;
 }
 
-nav {
-  background: lightgray;
-  display: flex;
-  align-items: center;
-  padding: 0 0.5rem;
-}
-
-nav h1 {
-  flex: auto;
-  margin: 0;
-}
-
-nav h1 a {
-  text-decoration: none;
-  padding: 0.25rem 0.5rem;
-}
-
-nav ul {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-nav ul li a,
-nav ul li span,
 header .action {
   display: block;
   padding: 0.5rem;
 }
 
+.page {
+    display: inline-block;
+    position: fixed;
+    z-index: 0;
+    width: calc(100% - 6rem - 250px);
+    height: 100%;
+    margin: 3rem 3rem 0rem 3rem;
+}
+
+.page > header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 12px;
+}
+
 .content {
-  padding: 0 1rem 1rem;
+    overflow-y: scroll;
+    min-height: 95%;
+    max-height: 100%;
+    background-color: var(--cinza-1);
+    border-radius: 1rem 1rem 0 0;
+    padding: 3rem 3rem 8rem 3rem;
+    margin-bottom: 20px;
 }
 
 .content > header {
-  border-bottom: 1px solid lightgray;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: flex-end;
 }
 
 .content > header h1 {
   flex: auto;
-  margin: 1rem 0 0.25rem 0;
+  margin: 0rem 0 0.25rem 0;
 }
 
 .content > header a {
@@ -135,13 +150,39 @@ header .action {
   margin-bottom: 1em;
 }
 
-.content textarea {
-  min-height: 12em;
-  resize: vertical;
-}
+/* remove? */
+
 
 input.danger {
-  color: #cc2f2e;
+  background-color: var(--red);
+  color: white;
+}
+
+input.save, input.create, input.pay {
+    color: white;
+}
+
+input.create {
+    font-size: 16px;
+}
+
+input:disabled {
+    color: white;
+}
+
+input:focus {
+    border: none;
+    outline: 3px var(--light-blue) solid;
+}
+
+input[type="text"], input[type="number"], input[type="date"], input[type="email"] {
+    padding: 0.3rem 0.3rem 0.2rem 0.3rem;
+    border-radius: 0.2rem;
+    border: 1px lightgray solid;
+}
+
+input[type="date"] {
+    font-family: "Roboto", sans-serif;
 }
 
 input[type="submit"] {
@@ -149,8 +190,8 @@ input[type="submit"] {
   min-width: 10em;
 }
 
-.delete-btn,
-.btn {
+/* remove? */
+.delete-btn {
   background: none;
   border: none;
   display: inline;
@@ -168,14 +209,187 @@ form.delete-form {
 .paid-container {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  height: 3rem;
 }
 
-.paid-container > a {
-  padding: 0 0 0 0.6rem;
+.paid-container label {
+    margin: 0 1rem 0 0;
 }
 
-footer {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
+
+/* NEW STUFF */
+
+/* Sidebar CSS */
+
+aside {
+    float: left;
+    height: 100svh;
+    background-color: var(--cinza-1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.7);
+    border-radius: 0 1rem 1rem 0;
+    z-index: 3;
+}
+
+.Sidebar {
+    color: var(--blue);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 10px;
+    gap: 50px;
+    height: 100%;
+    max-width: 250px;
+    max-height: 80%;
+    padding: 3.5rem 1.5rem;
+}
+
+.nav-item {
+    border: 0 solid transparent;
+    border-radius: 2rem;
+    padding: 0.8rem 0 0.8rem 1.5rem;
+    font-size: 1.1rem;
+    min-width: 13rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    color: var(--blue);
+    cursor: pointer;
+}
+
+.nav-item.active {
+    background-color: var(--dark-blue);
+    color: white;
+    box-shadow: 0px 5px 7px rgba(0, 0, 0, .5);
+}
+
+#logo {
+    color: var(--light-blue);
+    font-size: 2rem;
+    padding: 0;
+    justify-content: center;
+}
+
+.btn {
+    border: 0 solid transparent;
+    border-radius: 2rem;
+    padding: 0.3rem 1.5rem;
+    cursor: pointer;
+    background-color: var(--dark-blue);
+}
+
+.icon-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 1.2rem;
+}
+
+.trash-btn {
+    color: var(--blue);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.plus-icon {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.navigation {
+    justify-self: flex-end;
+    margin-left: auto;
+    margin-right: 1rem;
+}
+
+.navigation-btn:first-child {
+    padding-right: 2px;
+}
+
+.navigation-btn:last-child {
+    padding-left: 2px;
+}
+
+.edit-btn {
+    font-size: 16px;
+}
+
+#add-product-btn {
+    max-width: fit-content;
+    font-size: 14px;
+    background-color: var(--blue);
+}
+
+#add-product-btn > i {
+    font-size: inherit;
+}
+
+.products-container label {
+    color: var(--light-blue);
+    margin-bottom: 20px;
+}
+
+.products-container input {
+    margin-top: 0.5rem;
+}
+
+.product-container .trash-btn {
+    margin-left: 0.5rem;
+}
+
+#qty-lbl {
+    margin-left: 10.3rem;
+}
+
+.product-sku {
+    margin-right: 1rem;
+}
+
+/* Scrollbar */
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+  
+/* Track */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 1rem;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Transitions & animations */
+
+.fade {
+    animation: fade 0.3s ease-in 0s 1 normal forwards;
+}
+
+@keyframes fade {
+    0% {
+        color: #898787;
+        background-color: var(--cinza-1);
+        box-shadow: none;
+    }
+
+    100% {
+        color: white;
+        background-color: var(--dark-blue);
+        box-shadow: 0px 5px 7px rgba(0, 0, 0, .5);
+    }
 }

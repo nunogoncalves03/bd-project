@@ -1,7 +1,17 @@
-{% extends 'index_base.html' %} {% block header %}
+{% extends 'index_base.html' %}
+
+{% block orders_active %}active fade{% endblock %}
+
+{% block header %}
 <h1>{% block title %}Orders{% endblock %}</h1>
-<a href="{{ url_for('order_create') }}">New</a>
-{% endblock %} {% block content %} {% for order in orders %}
+<a class="btn icon-btn" href="{{ url_for('order_create') }}">
+    <i class="bi bi-plus-lg plus-icon"></i>
+    New
+</a>
+{% endblock %} 
+
+{% block content %} 
+{% for order in orders %}
 <article class="post">
     <header>
         <div>
@@ -15,11 +25,14 @@
             </div>
         </div>
         {% if not order['paid_by'] %}
-        <a class="action" id="paid" href="{{ url_for('order_pay', order_no=order['order_no']) }}">
+        <a class="btn icon-btn" id="paid" href="{{ url_for('order_pay', order_no=order['order_no']) }}">
+            <i class="bi bi-wallet2"></i>
             Pay
         </a>
         {% endif %}
-        <a class="action" href="{{ url_for('order_view', order_no=order['order_no']) }}">View</a>
+        <a href="{{ url_for('order_view', order_no=order['order_no']) }}">
+            <i class="bi bi-arrows-angle-expand expand-btn"></i>
+        </a>
     </header>
 </article>
 <hr>

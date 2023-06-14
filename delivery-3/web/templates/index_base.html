@@ -1,10 +1,14 @@
 {% extends 'base.html' %}
 
-{% block footer %}
+{% block navigation %}
 {% if page > 0 %}
-<a class="action" href="{% block prev_url %}{% endblock %}">Prev</a>
+<a class="navigation-btn" href="{% block prev_url %}{% endblock %}">
+    <i class="bi bi-chevron-left"></i>
+</a>
 {% endif %}
 {% if not last %}
-<a class="action" href="{% block next_url %}{% endblock %}">Next</a>
+<a class="navigation-btn" href="{% block next_url %}{% endblock %}">
+    <i class="bi bi-chevron-right"></i>
+</a>
 {% endif %}
 {% endblock %}
