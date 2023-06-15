@@ -47,32 +47,44 @@
         disabled
     >
 </form>
-<h1>Orders</h1>
+<h1 class="customer-orders-label">Orders</h1>
 <hr>
 {% for order in orders %}
 <article class="post">
     <header>
         <div>
-            <h1>{{ order['order_no'] }}</h1>
-            <div class="about">
-                {{ order['cust_no'] }} -
-                <b>{{ order['date'] }}</b>
-            </div>
-            <div class="body">
-                <label for="paid">Paid: {{ "Yes" if order['paid_by'] else "No"}}</label>
-            </div>
+            <h1>Order {{ order['order_no'] }}</h1>
         </div>
         {% if not order['paid_by'] %}
-        <a class="btn icon-btn" id="paid" href="{{ url_for('order_pay', order_no=order['order_no']) }}">
-            <i class="bi bi-wallet2"></i>
-            Pay
-        </a>
+        <form class="pay-form" action="{{ url_for('order_pay', order_no=order['order_no']) }}" method="post">
+            <button class="btn icon-btn" id="paid" onclick="return confirm('Customer {{ order['cust_no'] }}, pay order {{ order['order_no'] }}?')">
+                <i class="bi bi-wallet2"></i>
+                Pay
+            </button>
+        </form>
         {% endif %}
         <a class="btn icon-btn view-btn" href="{{ url_for('order_view', order_no=order['order_no']) }}">
             <i class="bi bi-eye"></i>
             View
         </a>
     </header>
+    <div class="info">
+        <p class="body">
+            <b>Order date:</b>
+            {{ order['date'] }}
+        </p>
+        <p class="body">
+            <b>Total:</b>
+            {{ order['total'] }}€ ({{ order['product_qty'] }} {{ 'items' if order['product_qty'] > 1 else 'item' }})
+        </p>
+        <p class="body">
+            <b>Paid:</b>
+            {{ "Yes" if order['paid_by'] else "No"}}
+        </p>
+    </div>
 </article>
+{% if not loop.last %}
+<hr>
+{% endif %}
 {% endfor %}
 {% endblock %}

@@ -19,16 +19,15 @@
             <div class="about">TIN: {{ supplier['tin'] }}</div>
         </div>
         <form class="delete-form" action="{{ url_for('supplier_delete', tin=supplier['tin']) }}" method="post">
-            <button class="btn icon-btn" onclick="return confirm('Are you sure?')">
+            <button class="btn icon-btn" onclick="return confirm('Are you sure you want to delete supplier {{ supplier['tin'] }}? The products supplied by them will still be available according to current stock.')">
                 <i class="bi bi-trash3"></i>
                 Delete
             </button>
         </form>
     </header>
-
     <div class="info">
         <p class="body">
-            <b>Address: </b>
+            <b>Address:</b>
             {{ supplier['address'] if supplier['address'] != None else 'NO ADDRESS' }}
         </p>
         <p class="body">

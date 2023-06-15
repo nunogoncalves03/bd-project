@@ -490,10 +490,16 @@ def customer_view(cust_no):
                         o.order_no,
                         o.cust_no,
                         o.date,
-                        p.cust_no AS paid_by
+                        p.cust_no AS paid_by,
+                        SUM(qty * price) AS total,
+                        SUM(qty) AS product_qty
                     FROM orders o
                     LEFT JOIN pay p USING (order_no)
-                    WHERE o.cust_no = %(cust_no)s;
+                    INNER JOIN contains USING (order_no)
+                    INNER JOIN product USING (sku)
+                    WHERE o.cust_no = %(cust_no)s
+                    GROUP BY o.order_no, p.cust_no
+                    ORDER BY o.date DESC;
                 """,
                 {"cust_no": cust_no},
             ).fetchall()
@@ -652,9 +658,14 @@ def orders_index(page=0):
                         o.order_no,
                         o.cust_no,
                         o.date,
-                        p.cust_no AS paid_by
+                        p.cust_no AS paid_by,
+                        SUM(qty * price) AS total,
+                        SUM(qty) AS product_qty
                     FROM orders o
                     LEFT JOIN pay p USING (order_no)
+                    INNER JOIN contains USING (order_no)
+                    INNER JOIN product USING (sku)
+                    GROUP BY o.order_no, p.cust_no
                     ORDER BY date DESC
                     OFFSET %(page)s
                     LIMIT 10;
@@ -702,10 +713,16 @@ def order_view(order_no):
                     o.order_no,
                     o.cust_no,
                     o.date,
-                    p.cust_no AS paid_by
+                    p.cust_no AS paid_by,
+                    SUM(qty * price) AS total,
+                    SUM(qty) AS product_qty
                 FROM orders o
                 LEFT JOIN pay p USING (order_no)
-                WHERE o.order_no = %(order_no)s;
+                INNER JOIN contains USING (order_no)
+                INNER JOIN product USING (sku)
+                WHERE o.order_no = %(order_no)s
+                GROUP BY o.order_no, p.cust_no
+                ORDER BY o.date DESC;
                 """,
                 {"order_no": order_no},
             ).fetchone()
@@ -735,56 +752,27 @@ def order_view(order_no):
 @app.route(
     "/orders/<order_no>/pay",
     methods=(
-        "GET",
         "POST",
     ),
 )
 def order_pay(order_no):
     """Pay the order."""
 
-    if request.method == "POST":
-        paid_by = request.form["paid_by"]
-
-        error = ""
-
-        if not paid_by:
-            error += "Customer number is required. "
-        elif not paid_by.isnumeric():
-            error += "Customer number is required to be numeric. "
-
-        if error != "":
-            flash(error)
-        else:
-            with pool.connection() as conn:
-                with conn.cursor(row_factory=namedtuple_row) as cur:
-                    cur.execute(
-                        """
-                        INSERT INTO pay(order_no, cust_no)
-                        VALUES
-                            (
-                            %(order_no)s,
-                            %(paid_by)s
-                            );
-                        """,
-                        {"order_no": order_no, "paid_by": paid_by},
-                    )
-
-            return redirect(url_for("order_view", order_no=order_no))
-
     with pool.connection() as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
-            order = cur.execute(
+            cur.execute(
                 """
-                SELECT * FROM orders
-                WHERE order_no = %(order_no)s;
+                INSERT INTO pay(order_no, cust_no)
+                VALUES
+                    (
+                    %(order_no)s,
+                    (SELECT cust_no FROM orders WHERE order_no = %(order_no)s)
+                    );
                 """,
                 {"order_no": order_no},
-            ).fetchone()
+            )
 
-    if order == None:
-        return redirect(url_for("orders_index"))
-
-    return render_template("orders/pay.html", order=order)
+    return redirect(url_for("order_view", order_no=order_no))
 
 
 @app.route("/orders/create", methods=("GET", "POST"))

@@ -54,7 +54,7 @@
         class="btn delete"
         type="submit"
         value="Delete"
-        onclick="return confirm('Are you sure?');"
+        onclick="return confirm('Are you sure you want to delete the product {{ product['sku'] }} and remove it from all orders? Note that it will stop being supplied.');"
     >
 </form>
 {% endblock %}

@@ -23,7 +23,7 @@
             Edit
         </a>
         <form class="delete-form" action="{{ url_for('product_delete', sku=product['sku']) }}" method="post">
-            <button class="btn icon-btn" onclick="return confirm('Are you sure?')">
+            <button class="btn icon-btn" onclick="return confirm('Are you sure you want to delete the product {{ product['sku'] }} and remove it from all orders? Note that it will stop being supplied.')">
                 <i class="bi bi-trash3"></i>
                 Delete
             </button>
@@ -31,15 +31,15 @@
     </header>
     <div class="info">
         <p class="body">
-            <b>Descrição: </b>
+            <b>Descrição:</b>
             {{ product['description'] if product['description'] != None else '' }}
         </p>
         <p class="body">
-            <b>Ean: </b>
+            <b>EAN:</b>
             {{ product['ean'] if product['ean'] != None else 'NO EAN' }}
         </p>
         <p class="body">
-            <b>Price: </b>
+            <b>Price:</b>
             {{ product['price'] }} €
         </p>
     </div>
