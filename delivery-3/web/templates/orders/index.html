@@ -15,14 +15,7 @@
 <article class="post">
     <header>
         <div>
-            <h1>{{ order['order_no'] }}</h1>
-            <div class="about">
-                {{ order['cust_no'] }} -
-                <b>{{ order['date'] }}</b>
-            </div>
-            <div class="body">
-                <label for="paid">Paid: {{ "Yes" if order['paid_by'] else "No"}}</label>
-            </div>
+            <h1>{{ order['order_no'] }}</h1>        
         </div>
         {% if not order['paid_by'] %}
         <a class="btn icon-btn" id="paid" href="{{ url_for('order_pay', order_no=order['order_no']) }}">
@@ -35,6 +28,21 @@
             View
         </a>
     </header>
+    <div class="info">
+        <p class="body">
+            <b>Order date: </b>
+            {{ order['date'] }}
+        </p>
+        <p class="body">
+            <b>Order by: </b>
+            {{ order['cust_no'] }}
+        </p>
+        <p class="body">
+            <b>Paid: </b>
+            {{ "Yes" if order['paid_by'] else "No"}}
+        </p>
+        
+    </div>
 </article>
 {% if not loop.last %}
 <hr>

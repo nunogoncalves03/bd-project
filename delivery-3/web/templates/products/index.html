@@ -16,7 +16,7 @@
     <header>
         <div>
             <h1>{{ product['name'] }}</h1>
-            <div class="about">{{ product['sku'] }} - {{ product['ean'] if product['ean'] != None else 'NO EAN' }}</div>
+            <div class="about">SKU: {{ product['sku'] }}</div>
         </div>
         <a class="btn icon-btn" href="{{ url_for('product_update', sku=product['sku']) }}">
             <i class="bi bi-pencil-fill"></i>
@@ -29,8 +29,20 @@
             </button>
         </form>
     </header>
-    <p class="highlight">{{ product['price'] }} €</p>
-    <p class="body">{{ product['description'] if product['description'] != None else '' }}</p>
+    <div class="info">
+        <p class="body">
+            <b>Descrição: </b>
+            {{ product['description'] if product['description'] != None else '' }}
+        </p>
+        <p class="body">
+            <b>Ean: </b>
+            {{ product['ean'] if product['ean'] != None else 'NO EAN' }}
+        </p>
+        <p class="body">
+            <b>Price: </b>
+            {{ product['price'] }} €
+        </p>
+    </div>
 </article>
 {% if not loop.last %}
 <hr>

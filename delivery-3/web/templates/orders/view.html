@@ -39,7 +39,7 @@
         disabled
     >
     <div class="paid-container">
-        <label for="paid">Paid: {{ "Yes" if order['paid_by'] else "No"}}</label>
+        <label for="paid"><b>Paid</b>: {{ "Yes" if order['paid_by'] else "No"}}</label>
         {% if not order['paid_by'] %}
         <a class="btn icon-btn" id="paid" href="{{ url_for('order_pay', order_no=order['order_no']) }}">
             <i class="bi bi-wallet2"></i>
@@ -47,7 +47,7 @@
         </a>
         {% endif %}
     </div>
-    <label for="products-container">Products</label>
+    <label class="products-container-view" for="products-container">Products</label>
     <div class="products-container">
         <label id="sku-lbl">SKU:</label>
         <label id="qty-lbl">Qty:</label>

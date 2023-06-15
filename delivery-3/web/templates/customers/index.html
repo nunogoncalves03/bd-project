@@ -33,6 +33,10 @@
     </header>
     <div class="info">
         <p class="body">
+            <b>Address:</b>
+            {{ customer['address'] if customer['address'] else 'NA'}}
+        </p>
+        <p class="body">
             <b>E-mail:</b>
             {{ customer['email'] }}
         </p>
@@ -40,10 +44,7 @@
             <b>Phone number:</b>
             {{ customer['phone'] if customer['phone'] != None else 'NA' }}
         </p>
-        <p class="body">
-            <b>Address:</b>
-            {{ customer['address'] if customer['address'] else 'NA'}}
-        </p>
+        
     </div>
 </article>
 {% if not loop.last %}
