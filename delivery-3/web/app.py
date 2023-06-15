@@ -505,20 +505,23 @@ def customer_view(cust_no):
 @app.route("/customers/create", methods=("GET", "POST"))
 def customer_create():
     """Create a customer."""
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            cust_no = cur.execute(
+                """
+                SELECT MAX(cust_no) FROM customer;
+                """
+            ).fetchone()
+    cust_no = int(cust_no[0]) + 1
+
 
     if request.method == "POST":
-        cust_no = request.form["cust_no"]
         name = request.form["name"]
         email = request.form["email"]
         phone = request.form["phone"]
         address = request.form["address"]
 
         error = ""
-
-        if not cust_no:
-            error += "Customer number is required. "
-        elif not cust_no.isnumeric():
-            error += "Customer number is required to be numeric. "
 
         if not name:
             error += "Name is required. "
@@ -560,7 +563,7 @@ def customer_create():
 
             return redirect(url_for("customers_index"))
 
-    return render_template("customers/create.html")
+    return render_template("customers/create.html", cust_no=cust_no)
 
 
 @app.route("/customers/<cust_no>/delete", methods=("POST",))
@@ -778,19 +781,22 @@ def order_pay(order_no):
 @app.route("/orders/create", methods=("GET", "POST"))
 def order_create():
     """Create a order."""
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            order_no = cur.execute(
+                """
+                SELECT MAX(order_no) FROM orders;
+                """
+            ).fetchone()
+    order_no = int(order_no[0]) + 1
+
 
     if request.method == "POST":
-        order_no = request.form["order_no"]
         cust_no = request.form["cust_no"]
         date = request.form["date"]
         products = json.loads(request.form["products"])
 
         error = ""
-
-        if not order_no:
-            error += "Order number is required. "
-        elif not order_no.isnumeric():
-            error += "Order number is required to be numeric. "
 
         if not cust_no:
             error += "Customer number is required. "
@@ -846,7 +852,7 @@ def order_create():
 
             return redirect(url_for("orders_index"))
 
-    return render_template("orders/create.html")
+    return render_template("orders/create.html", order_no=order_no)
 
 
 @app.route("/ping", methods=("GET",))
