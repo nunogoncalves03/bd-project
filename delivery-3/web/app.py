@@ -40,7 +40,7 @@ dictConfig(
 )
 
 app = Flask(__name__)
-log = app.logger
+app.secret_key = "NsJbe2ryUYtopdXWkcx8gyfC8qa5XKW7L5UjmCqJB4hRloL6C8JKnfx0IjbkM5hj"
 
 
 @app.route("/products", methods=("GET",))
@@ -111,8 +111,11 @@ def product_create():
 
         if not price:
             error += "Price is required. "
-        elif not price.isnumeric():
-            error += "Price is required to be numeric. "
+        else:
+            try:
+                float(price)
+            except ValueError:
+                error += "Price is required to be numeric. "
 
         if not ean:
             ean = None
@@ -176,8 +179,11 @@ def product_update(sku):
 
         if not price:
             error += "Price is required. "
-        elif not price.isnumeric():
-            error += "Price is required to be numeric. "
+        else:
+            try:
+                float(price)
+            except ValueError:
+                error += "Price is required to be numeric. "
 
         if error != "":
             flash(error)
@@ -512,8 +518,11 @@ def customer_create():
                 SELECT MAX(cust_no) FROM customer;
                 """
             ).fetchone()
-    cust_no = int(cust_no[0]) + 1
 
+            if cust_no[0]:
+                cust_no = cust_no[0] + 1
+            else:
+                cust_no = 1
 
     if request.method == "POST":
         name = request.form["name"]
@@ -788,8 +797,11 @@ def order_create():
                 SELECT MAX(order_no) FROM orders;
                 """
             ).fetchone()
-    order_no = int(order_no[0]) + 1
 
+            if order_no[0]:
+                order_no = order_no[0] + 1
+            else:
+                order_no = 1
 
     if request.method == "POST":
         cust_no = request.form["cust_no"]
