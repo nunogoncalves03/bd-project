@@ -25,6 +25,10 @@ i {
   font-size: inherit;
 }
 
+button {
+  all: unset;
+}
+
 body {
   background-color: var(--cinza-4);
   font-family: "Roboto", sans-serif;
@@ -51,6 +55,10 @@ hr {
 header .action {
   display: block;
   padding: 0.5rem;
+}
+
+article {
+  margin-bottom: 2em;
 }
 
 .page {
@@ -121,6 +129,13 @@ header .action {
   font-style: italic;
 }
 
+.info {
+  margin-top: 0.2em;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Three columns with equal width */
+  grid-gap: 0px; /* Gap between grid items */
+}
+
 .post .body {
   white-space: pre-line;
 }
@@ -175,6 +190,10 @@ input:focus {
   outline: 3px var(--light-blue) solid;
 }
 
+input.danger:focus {
+  outline: 3px rgb(243, 102, 102) solid;
+}
+
 input[type="text"],
 input[type="number"],
 input[type="date"],
@@ -182,6 +201,7 @@ input[type="email"] {
   padding: 0.3rem 0.3rem 0.2rem 0.3rem;
   border-radius: 0.2rem;
   border: 1px lightgray solid;
+  background-color: rgb(219, 219, 219);
 }
 
 input[type="date"] {
@@ -193,8 +213,14 @@ input[type="submit"] {
   min-width: 10em;
 }
 
+input:disabled {
+  background-color: #232526;
+  border-color: #414649;
+}
+
 input#paid_by {
-  background-color: rgba(239, 239, 239, 0.3);
+  background-color: #232526;
+  border-color: #414649;
   color: white;
   outline: none;
 }
@@ -205,7 +231,7 @@ input#paid_by {
 }
 
 form.delete-form {
-  margin: 0;
+  margin: 0 0 0 1rem;
   display: block;
 }
 
@@ -293,6 +319,7 @@ aside {
   align-items: center;
   gap: 6px;
   padding-left: 1.2rem;
+  color: white;
 }
 
 .trash-btn {
@@ -322,6 +349,10 @@ aside {
 
 .edit-btn {
   font-size: 16px;
+}
+
+.view-btn {
+  margin-left: 1rem;
 }
 
 #add-product-btn {

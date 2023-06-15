@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block navigation %}
-<a class="navigation-btn" href="{{ url_for('orders_index') }}">
+<a class="navigation-btn" href="{{ url_for('customer_view', cust_no=order['cust_no']) }}">
     <i class="bi bi-chevron-left"></i>
 </a>
 {% endblock %}

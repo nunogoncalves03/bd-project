@@ -68,8 +68,6 @@ def products_index(page=0):
                 {"page": page * 10},
             ).fetchall()
 
-            log.debug(f"Found {cur.rowcount} rows.")
-
             if cur.rowcount == 0 and page != 0:
                 return redirect(url_for("products_index"))
 
@@ -77,8 +75,6 @@ def products_index(page=0):
                 query,
                 {"page": (page + 1) * 10},
             ).fetchall()
-
-            log.debug(f"Found {cur.rowcount} rows.")
 
             last = True if cur.rowcount == 0 else False
 
@@ -168,7 +164,6 @@ def product_update(sku):
                 """,
                 {"sku": sku},
             ).fetchone()
-            log.debug(f"Found {cur.rowcount} rows.")
 
             if product == None:
                 return redirect(url_for("products_index"))
@@ -221,23 +216,6 @@ def product_delete(sku):
                 {"sku": sku},
             )
 
-            cur.execute(
-                """
-                WITH orders_to_be_deleted AS (
-                    SELECT
-                        c.order_no
-                    FROM
-                        contains c
-                    WHERE SKU = %(sku)s
-                        AND (SELECT COUNT(*) FROM contains WHERE order_no = c.order_no) = 1
-                )
-                DELETE FROM contains
-                WHERE SKU = %(sku)s
-                    AND order_no NOT IN (SELECT order_no FROM orders_to_be_deleted);
-                """,
-                {"sku": sku},
-            )
-
             orders = cur.execute(
                 """
                 SELECT
@@ -249,6 +227,15 @@ def product_delete(sku):
                 """,
                 {"sku": sku},
             ).fetchall()
+
+            cur.execute(
+                """
+                DELETE FROM contains
+                WHERE SKU = %(sku)s
+                    AND order_no != ALL(%(orders)s);
+                """,
+                {"sku": sku, "orders": list(map(lambda x: x[0], orders))},
+            )
 
             for order in orders:
                 order_no = order[0]
@@ -318,8 +305,6 @@ def suppliers_index(page=0):
                 {"page": page * 10},
             ).fetchall()
 
-            log.debug(f"Found {cur.rowcount} rows.")
-
             if cur.rowcount == 0 and page != 0:
                 return redirect(url_for("suppliers_index"))
 
@@ -327,8 +312,6 @@ def suppliers_index(page=0):
                 query,
                 {"page": (page + 1) * 10},
             ).fetchall()
-
-            log.debug(f"Found {cur.rowcount} rows.")
 
             last = True if cur.rowcount == 0 else False
 
@@ -454,8 +437,6 @@ def customers_index(page=0):
                 {"page": page * 10},
             ).fetchall()
 
-            log.debug(f"Found {cur.rowcount} rows.")
-
             if cur.rowcount == 0 and page != 0:
                 return redirect(url_for("customers_index"))
 
@@ -463,8 +444,6 @@ def customers_index(page=0):
                 query,
                 {"page": (page + 1) * 10},
             ).fetchall()
-
-            log.debug(f"Found {cur.rowcount} rows.")
 
             last = True if cur.rowcount == 0 else False
 
@@ -478,6 +457,49 @@ def customers_index(page=0):
     return render_template(
         "customers/index.html", customers=customers, page=page, last=last
     )
+
+
+@app.route("/customers/view/<cust_no>", methods=("GET",))
+def customer_view(cust_no):
+    """Show the customer."""
+
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            customer = cur.execute(
+                """
+                SELECT
+                    *
+                FROM customer
+                WHERE cust_no = %(cust_no)s;
+                """,
+                {"cust_no": cust_no},
+            ).fetchone()
+
+            if customer == None:
+                return redirect(url_for("customers_index"))
+
+            orders = cur.execute(
+                """
+                    SELECT
+                        o.order_no,
+                        o.cust_no,
+                        o.date,
+                        p.cust_no AS paid_by
+                    FROM orders o
+                    LEFT JOIN pay p USING (order_no)
+                    WHERE o.cust_no = %(cust_no)s;
+                """,
+                {"cust_no": cust_no},
+            ).fetchall()
+
+    # API-like response is returned to clients that request JSON explicitly (e.g., fetch)
+    if (
+        request.accept_mimetypes["application/json"]
+        and not request.accept_mimetypes["text/html"]
+    ):
+        return jsonify({"customer": customer, "orders": orders})
+
+    return render_template("customers/view.html", customer=customer, orders=orders)
 
 
 @app.route("/customers/create", methods=("GET", "POST"))
@@ -631,8 +653,6 @@ def orders_index(page=0):
                 {"page": page * 10},
             ).fetchall()
 
-            log.debug(f"Found {cur.rowcount} rows.")
-
             if cur.rowcount == 0 and page != 0:
                 return redirect(url_for("orders_index"))
 
@@ -640,8 +660,6 @@ def orders_index(page=0):
                 query,
                 {"page": (page + 1) * 10},
             ).fetchall()
-
-            log.debug(f"Found {cur.rowcount} rows.")
 
             last = True if cur.rowcount == 0 else False
 
@@ -692,8 +710,6 @@ def order_view(order_no):
                 {"order_no": order_no},
             ).fetchall()
 
-            log.debug(f"Found {cur.rowcount} rows.")
-
     # API-like response is returned to clients that request JSON explicitly (e.g., fetch)
     if (
         request.accept_mimetypes["application/json"]
@@ -740,8 +756,6 @@ def order_pay(order_no):
                         """,
                         {"order_no": order_no, "paid_by": paid_by},
                     )
-
-                    log.debug(f"Found {cur.rowcount} rows.")
 
             return redirect(url_for("order_view", order_no=order_no))
 
@@ -837,7 +851,6 @@ def order_create():
 
 @app.route("/ping", methods=("GET",))
 def ping():
-    log.debug("ping!")
     return jsonify({"message": "pong!", "status": "success"})
 
 

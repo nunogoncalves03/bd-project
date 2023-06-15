@@ -18,12 +18,14 @@
             <h1>{{ product['name'] }}</h1>
             <div class="about">{{ product['sku'] }} - {{ product['ean'] if product['ean'] != None else 'NO EAN' }}</div>
         </div>
-        <a href="{{ url_for('product_update', sku=product['sku']) }}">
-            <i class="bi bi-pencil-fill edit-btn"></i>
+        <a class="btn icon-btn" href="{{ url_for('product_update', sku=product['sku']) }}">
+            <i class="bi bi-pencil-fill"></i>
+            Edit
         </a>
         <form class="delete-form" action="{{ url_for('product_delete', sku=product['sku']) }}" method="post">
-            <button class="delete-btn">
-                <i class="bi bi-trash3-fill trash-btn" onclick="return confirm('Are you sure?')"></i>
+            <button class="btn icon-btn" onclick="return confirm('Are you sure?')">
+                <i class="bi bi-trash3"></i>
+                Delete
             </button>
         </form>
     </header>

@@ -30,8 +30,9 @@
             Pay
         </a>
         {% endif %}
-        <a href="{{ url_for('order_view', order_no=order['order_no']) }}">
-            <i class="bi bi-arrows-angle-expand expand-btn"></i>
+        <a class="btn icon-btn view-btn" href="{{ url_for('order_view', order_no=order['order_no']) }}">
+            <i class="bi bi-eye"></i>
+            View
         </a>
     </header>
 </article>
