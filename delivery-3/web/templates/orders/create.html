@@ -93,7 +93,7 @@
 
         // fetch all products and stringify them
         let products_array = [];
-        for (const element of products.children) {
+        for (const element of Array.from(products.children).slice(2)) {
             const product_sku = element.firstChild;
             const product_qty = element.children[1]
 
