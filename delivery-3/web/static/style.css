@@ -264,7 +264,7 @@ aside {
 	gap: 40px;
 	height: 100%;
 	max-width: 250px;
-	max-height: min(60%, 600px);
+	max-height: min(50%, 550px);
 	padding: 3.5rem 1.5rem;
 }
 
@@ -457,4 +457,21 @@ label.total-lbl {
 
 .paid-container > label {
 	font-weight: normal;
+}
+
+.orders-header {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.orders-header > #orders-add-btn {
+	font-size: 14px;
+	gap: 6px;
+	border-radius: 2rem;
+	padding: 0.2rem 1rem 0.2rem 0.8rem;
+}
+
+.orders-header > #orders-add-btn > i {
+	font-size: 18px;
 }

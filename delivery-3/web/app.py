@@ -465,7 +465,7 @@ def customers_index(page=0):
     )
 
 
-@app.route("/customers/view/<cust_no>", methods=("GET",))
+@app.route("/customers/<cust_no>/view", methods=("GET",))
 def customer_view(cust_no):
     """Show the customer."""
 
@@ -517,18 +517,6 @@ def customer_view(cust_no):
 @app.route("/customers/create", methods=("GET", "POST"))
 def customer_create():
     """Create a customer."""
-    with pool.connection() as conn:
-        with conn.cursor(row_factory=namedtuple_row) as cur:
-            cust_no = cur.execute(
-                """
-                SELECT MAX(cust_no) FROM customer;
-                """
-            ).fetchone()
-
-            if cust_no[0]:
-                cust_no = cust_no[0] + 1
-            else:
-                cust_no = 1
 
     if request.method == "POST":
         name = request.form["name"]
@@ -555,6 +543,17 @@ def customer_create():
         else:
             with pool.connection() as conn:
                 with conn.cursor(row_factory=namedtuple_row) as cur:
+                    cust_no = cur.execute(
+                        """
+                        SELECT MAX(cust_no) FROM customer;
+                        """
+                    ).fetchone()
+
+                    if cust_no[0]:
+                        cust_no = cust_no[0] + 1
+                    else:
+                        cust_no = 1
+
                     cur.execute(
                         """
                         INSERT INTO customer(cust_no, name, email, phone, address)
@@ -576,7 +575,20 @@ def customer_create():
                         },
                     )
 
-            return redirect(url_for("customers_index"))
+            return redirect(url_for("customer_view", cust_no=cust_no))
+
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            cust_no = cur.execute(
+                """
+                SELECT MAX(cust_no) FROM customer;
+                """
+            ).fetchone()
+
+            if cust_no[0]:
+                cust_no = cust_no[0] + 1
+            else:
+                cust_no = 1
 
     return render_template("customers/create.html", cust_no=cust_no)
 
@@ -700,9 +712,8 @@ def orders_index(page=0):
         last=last,
     )
 
-
-@app.route("/orders/view/<order_no>", methods=("GET",))
-def order_view(order_no):
+@app.route("/customers/<cust_no>/orders/<order_no>/view", methods=("GET",))
+def order_view(cust_no, order_no):
     """Show the order."""
 
     with pool.connection() as conn:
@@ -728,7 +739,7 @@ def order_view(order_no):
             ).fetchone()
 
             if order == None:
-                return redirect(url_for("orders_index"))
+                return redirect(url_for("customer_view", cust_no=cust_no))
 
             products = cur.execute(
                 """
@@ -750,12 +761,12 @@ def order_view(order_no):
 
 
 @app.route(
-    "/orders/<order_no>/pay",
+    "/customers/<cust_no>/orders/<order_no>/pay",
     methods=(
         "POST",
     ),
 )
-def order_pay(order_no):
+def order_pay(cust_no, order_no):
     """Pay the order."""
 
     with pool.connection() as conn:
@@ -772,36 +783,17 @@ def order_pay(order_no):
                 {"order_no": order_no},
             )
 
-    return redirect(url_for("order_view", order_no=order_no))
+    return redirect(url_for("order_view", cust_no=cust_no, order_no=order_no))
 
-
-@app.route("/orders/create", methods=("GET", "POST"))
-def order_create():
+@app.route("/customers/<cust_no>/orders/create", methods=("GET", "POST"))
+def order_create(cust_no):
     """Create a order."""
-    with pool.connection() as conn:
-        with conn.cursor(row_factory=namedtuple_row) as cur:
-            order_no = cur.execute(
-                """
-                SELECT MAX(order_no) FROM orders;
-                """
-            ).fetchone()
-
-            if order_no[0]:
-                order_no = order_no[0] + 1
-            else:
-                order_no = 1
 
     if request.method == "POST":
-        cust_no = request.form["cust_no"]
         date = request.form["date"]
         products = json.loads(request.form["products"])
 
         error = ""
-
-        if not cust_no:
-            error += "Customer number is required. "
-        elif not cust_no.isnumeric():
-            error += "Customer number is required to be numeric. "
 
         if not date:
             error += "Date is required. "
@@ -819,6 +811,17 @@ def order_create():
         else:
             with pool.connection() as conn:
                 with conn.cursor(row_factory=namedtuple_row) as cur:
+                    order_no = cur.execute(
+                        """
+                        SELECT MAX(order_no) FROM orders;
+                        """
+                    ).fetchone()
+
+                    if order_no[0]:
+                        order_no = order_no[0] + 1
+                    else:
+                        order_no = 1
+
                     cur.execute(
                         """
                         INSERT INTO orders(order_no, cust_no, date)
@@ -850,9 +853,22 @@ def order_create():
                             },
                         )
 
-            return redirect(url_for("orders_index"))
+            return redirect(url_for("order_view", cust_no=cust_no, order_no=order_no))
 
-    return render_template("orders/create.html", order_no=order_no)
+    with pool.connection() as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            order_no = cur.execute(
+                """
+                SELECT MAX(order_no) FROM orders;
+                """
+            ).fetchone()
+
+            if order_no[0]:
+                order_no = order_no[0] + 1
+            else:
+                order_no = 1
+
+    return render_template("orders/create.html", cust_no=cust_no, order_no=order_no)
 
 
 @app.route("/ping", methods=("GET",))

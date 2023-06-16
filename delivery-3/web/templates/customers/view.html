@@ -47,7 +47,13 @@
         disabled
     >
 </form>
-<h1 class="customer-orders-label">Orders</h1>
+<div class="orders-header">
+    <h1 class="customer-orders-label">Orders</h1>
+    <a class="btn icon-btn" id="orders-add-btn" href="{{ url_for('order_create', cust_no=customer['cust_no']) }}">
+        <i class="bi bi-plus-lg plus-icon"></i>
+        New
+    </a>
+</div>
 <hr>
 {% for order in orders %}
 <article class="post">
@@ -56,14 +62,14 @@
             <h1>Order {{ order['order_no'] }}</h1>
         </div>
         {% if not order['paid_by'] %}
-        <form class="pay-form" action="{{ url_for('order_pay', order_no=order['order_no']) }}" method="post">
+        <form class="pay-form" action="{{ url_for('order_pay', cust_no=customer['cust_no'], order_no=order['order_no']) }}" method="post">
             <button class="btn icon-btn" id="paid" onclick="return confirm('Customer {{ order['cust_no'] }}, pay order {{ order['order_no'] }}?')">
                 <i class="bi bi-wallet2"></i>
                 Pay
             </button>
         </form>
         {% endif %}
-        <a class="btn icon-btn view-btn" href="{{ url_for('order_view', order_no=order['order_no']) }}">
+        <a class="btn icon-btn view-btn" href="{{ url_for('order_view', cust_no=order['cust_no'], order_no=order['order_no']) }}">
             <i class="bi bi-eye"></i>
             View
         </a>

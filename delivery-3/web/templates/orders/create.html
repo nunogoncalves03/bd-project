@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block orders_active %}active{% endblock %}
+{% block customers_active %}active{% endblock %}
 
 {% block header %}
 <h1>{% block title %}Place order{% endblock %}</h1>
 {% endblock %}
 
 {% block navigation %}
-<a class="navigation-btn" href="{{ url_for('orders_index') }}">
+<a class="navigation-btn" href="{{ url_for('customer_view', cust_no=cust_no) }}">
     <i class="bi bi-chevron-left"></i>
 </a>
 {% endblock %}
@@ -29,8 +29,8 @@
         id="cust_no"
         type="number"
         min="0"
-        value="{{ request.form['cust_no'] }}"
-        required
+        value="{{ cust_no }}"
+        disabled
     >
     <label for="date">Date</label>
     <input
