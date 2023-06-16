@@ -722,7 +722,7 @@ def order_view(cust_no, order_no, page=0):
             ).fetchall()
 
             if cur.rowcount == 0 and page != 0:
-                return redirect(url_for("customer_view", cust_no=cust_no))
+                return redirect(url_for("order_view", cust_no=cust_no, order_no=order_no))
 
             cur.execute(
                 query,
