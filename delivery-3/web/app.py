@@ -50,6 +50,7 @@ def products_index(page=0):
 
     page = int(page)
 
+    # invalid page
     if page < 0:
         return redirect(url_for("products_index"))
 
@@ -68,9 +69,11 @@ def products_index(page=0):
                 {"page": page * 10},
             ).fetchall()
 
+            # prevent invalid page access and infinite loop if there's no content to display
             if cur.rowcount == 0 and page != 0:
                 return redirect(url_for("products_index"))
 
+            # check if there should be a following page
             cur.execute(
                 query,
                 {"page": (page + 1) * 10},
@@ -168,6 +171,7 @@ def product_update(sku):
                 {"sku": sku},
             ).fetchone()
 
+            # prevent invalid page access
             if product == None:
                 return redirect(url_for("products_index"))
 
@@ -212,6 +216,7 @@ def product_delete(sku):
 
     with pool.connection() as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
+            # remove the product from all its supplier contracts
             cur.execute(
                 """
                 UPDATE supplier
@@ -222,6 +227,7 @@ def product_delete(sku):
                 {"sku": sku},
             )
 
+            # grab all orders that only contain the product to delete
             orders = cur.execute(
                 """
                 SELECT
@@ -234,6 +240,7 @@ def product_delete(sku):
                 {"sku": sku},
             ).fetchall()
 
+            # remove product from orders that contain this product and others
             cur.execute(
                 """
                 DELETE FROM contains
@@ -243,6 +250,7 @@ def product_delete(sku):
                 {"sku": sku, "orders": list(map(lambda x: x[0], orders))},
             )
 
+            # remove all orders (that only have that product) and its references (simulate fk on delete cascade)
             for order in orders:
                 order_no = order[0]
 
@@ -275,6 +283,7 @@ def product_delete(sku):
                     {"order_no": order_no},
                 )
 
+            # delete the product itself
             cur.execute(
                 """
                 DELETE FROM product
@@ -293,6 +302,7 @@ def suppliers_index(page=0):
 
     page = int(page)
 
+    # invalid page
     if page < 0:
         return redirect(url_for("suppliers_index"))
 
@@ -311,9 +321,11 @@ def suppliers_index(page=0):
                 {"page": page * 10},
             ).fetchall()
 
+            # prevent invalid page access and infinite loop if there's no content to display
             if cur.rowcount == 0 and page != 0:
                 return redirect(url_for("suppliers_index"))
 
+            # check if there should be a following page
             cur.execute(
                 query,
                 {"page": (page + 1) * 10},
@@ -398,6 +410,7 @@ def supplier_delete(tin):
 
     with pool.connection() as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
+            # remove all deliveries associated with that supplier (simulate fk on delete cascade)
             cur.execute(
                 """
                 DELETE FROM delivery
@@ -406,6 +419,7 @@ def supplier_delete(tin):
                 {"tin": tin},
             )
 
+            # delete the product itself
             cur.execute(
                 """
                 DELETE FROM supplier
@@ -425,6 +439,7 @@ def customers_index(page=0):
 
     page = int(page)
 
+    # invalid page
     if page < 0:
         return redirect(url_for("customers_index"))
 
@@ -443,9 +458,11 @@ def customers_index(page=0):
                 {"page": page * 10},
             ).fetchall()
 
+            # prevent invalid page access and infinite loop if there's no content to display
             if cur.rowcount == 0 and page != 0:
                 return redirect(url_for("customers_index"))
 
+            # check if there should be a following page
             cur.execute(
                 query,
                 {"page": (page + 1) * 10},
@@ -472,6 +489,7 @@ def customer_view(cust_no, page=0):
 
     page = int(page)
 
+    # invalid page
     if page < 0:
         return redirect(url_for("customer_view", cust_no=cust_no))
 
@@ -487,6 +505,7 @@ def customer_view(cust_no, page=0):
                 {"cust_no": cust_no},
             ).fetchone()
 
+            # prevent invalid page access
             if customer == None:
                 return redirect(url_for("customers_index"))
             
@@ -514,9 +533,11 @@ def customer_view(cust_no, page=0):
                 {"cust_no": cust_no, "page": page * 10},
             ).fetchall()
 
+            # prevent invalid page access and infinite loop if there's no content to display
             if cur.rowcount == 0 and page != 0:
                 return redirect(url_for("customer_view", cust_no=cust_no))
 
+            # check if there should be a following page
             cur.execute(
                 query,
                 {"cust_no": cust_no, "page": (page + 1) * 10},
@@ -569,6 +590,7 @@ def customer_create():
                         """
                     ).fetchone()
 
+                    # generate next cust_no
                     if cust_no[0]:
                         cust_no = cust_no[0] + 1
                     else:
@@ -605,6 +627,7 @@ def customer_create():
                 """
             ).fetchone()
 
+            # generate next cust_no
             if cust_no[0]:
                 cust_no = cust_no[0] + 1
             else:
@@ -619,6 +642,7 @@ def customer_delete(cust_no):
 
     with pool.connection() as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
+            # grab all customer orders
             orders = cur.execute(
                 """
                 SELECT
@@ -630,6 +654,7 @@ def customer_delete(cust_no):
                 {"cust_no": cust_no},
             ).fetchall()
 
+            # remove all customer orders and its references (simulate fk on delete cascade)
             for order in orders:
                 order_no = order[0]
 
@@ -662,6 +687,7 @@ def customer_delete(cust_no):
                     {"order_no": order_no},
                 )
 
+            # delete the customer itself
             cur.execute(
                 """
                 DELETE FROM customer
@@ -680,6 +706,7 @@ def order_view(cust_no, order_no, page=0):
 
     page = int(page)
 
+    # invalid page
     if page < 0:
         return redirect(url_for("order_view", cust_no=cust_no, order_no=order_no))
 
@@ -705,6 +732,7 @@ def order_view(cust_no, order_no, page=0):
                 {"order_no": order_no},
             ).fetchone()
 
+            # prevent invalid page access
             if order == None:
                 return redirect(url_for("customer_view", cust_no=cust_no))
 
@@ -721,9 +749,11 @@ def order_view(cust_no, order_no, page=0):
                 {"order_no": order_no, "page": page * 10},
             ).fetchall()
 
+            # prevent invalid page access and infinite loop if there's no content to display
             if cur.rowcount == 0 and page != 0:
                 return redirect(url_for("order_view", cust_no=cust_no, order_no=order_no))
 
+            # check if there should be a following page
             cur.execute(
                 query,
                 {"order_no": order_no, "page": (page + 1) * 10},
@@ -772,6 +802,8 @@ def order_create(cust_no):
 
     if request.method == "POST":
         date = request.form["date"]
+
+        # products data was created with JS as an array and sent as JSON
         products = json.loads(request.form["products"])
 
         error = ""
@@ -798,6 +830,7 @@ def order_create(cust_no):
                         """
                     ).fetchone()
 
+                    # generate next order_no
                     if order_no[0]:
                         order_no = order_no[0] + 1
                     else:
@@ -844,6 +877,7 @@ def order_create(cust_no):
                 """
             ).fetchone()
 
+            # generate next order_no
             if order_no[0]:
                 order_no = order_no[0] + 1
             else:
