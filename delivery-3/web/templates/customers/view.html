@@ -47,12 +47,26 @@
         disabled
     >
 </form>
-<div class="orders-header">
+<div class="customer-orders-header">
     <h1 class="customer-orders-label">Orders</h1>
     <a class="btn icon-btn" id="orders-add-btn" href="{{ url_for('order_create', cust_no=customer['cust_no']) }}">
         <i class="bi bi-plus-lg plus-icon"></i>
         New
     </a>
+    <div class="navigation">
+        {% if page > 0 %}
+        <a class="navigation-btn prev btn icon-btn" href="{{ url_for('customer_view', cust_no=customer['cust_no'], page=page-1) }}">
+            <i class="bi bi-chevron-left"></i>
+            Prev
+        </a>
+        {% endif %}
+        {% if not last %}
+        <a class="navigation-btn next btn icon-btn" href="{{ url_for('customer_view', cust_no=customer['cust_no'], page=page+1) }}">
+            Next
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        {% endif %}
+    </div>
 </div>
 <hr>
 {% for order in orders %}

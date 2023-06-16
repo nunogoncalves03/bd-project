@@ -466,8 +466,14 @@ def customers_index(page=0):
 
 
 @app.route("/customers/<cust_no>/view", methods=("GET",))
-def customer_view(cust_no):
+@app.route("/customers/<cust_no>/view/<page>", methods=("GET",))
+def customer_view(cust_no, page=0):
     """Show the customer."""
+
+    page = int(page)
+
+    if page < 0:
+        return redirect(url_for("customer_view", cust_no=cust_no))
 
     with pool.connection() as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
@@ -483,26 +489,40 @@ def customer_view(cust_no):
 
             if customer == None:
                 return redirect(url_for("customers_index"))
+            
+            query = """
+                SELECT
+                    o.order_no,
+                    o.cust_no,
+                    o.date,
+                    p.cust_no AS paid_by,
+                    SUM(qty * price) AS total,
+                    SUM(qty) AS product_qty
+                FROM orders o
+                LEFT JOIN pay p USING (order_no)
+                INNER JOIN contains USING (order_no)
+                INNER JOIN product USING (sku)
+                WHERE o.cust_no = %(cust_no)s
+                GROUP BY o.order_no, p.cust_no
+                ORDER BY o.date DESC
+                OFFSET %(page)s
+                LIMIT 10;
+            """
 
             orders = cur.execute(
-                """
-                    SELECT
-                        o.order_no,
-                        o.cust_no,
-                        o.date,
-                        p.cust_no AS paid_by,
-                        SUM(qty * price) AS total,
-                        SUM(qty) AS product_qty
-                    FROM orders o
-                    LEFT JOIN pay p USING (order_no)
-                    INNER JOIN contains USING (order_no)
-                    INNER JOIN product USING (sku)
-                    WHERE o.cust_no = %(cust_no)s
-                    GROUP BY o.order_no, p.cust_no
-                    ORDER BY o.date DESC;
-                """,
-                {"cust_no": cust_no},
+                query,
+                {"cust_no": cust_no, "page": page * 10},
             ).fetchall()
+
+            if cur.rowcount == 0 and page != 0:
+                return redirect(url_for("customer_view", cust_no=cust_no))
+
+            cur.execute(
+                query,
+                {"cust_no": cust_no, "page": (page + 1) * 10},
+            ).fetchall()
+
+            last = True if cur.rowcount == 0 else False
 
     # API-like response is returned to clients that request JSON explicitly (e.g., fetch)
     if (
@@ -511,7 +531,7 @@ def customer_view(cust_no):
     ):
         return jsonify({"customer": customer, "orders": orders})
 
-    return render_template("customers/view.html", customer=customer, orders=orders)
+    return render_template("customers/view.html", customer=customer, orders=orders, page=page, last=last)
 
 
 @app.route("/customers/create", methods=("GET", "POST"))
@@ -653,68 +673,15 @@ def customer_delete(cust_no):
     return redirect(url_for("customers_index"))
 
 
-@app.route("/orders", methods=("GET",))
-@app.route("/orders/<page>", methods=("GET",))
-def orders_index(page=0):
-    """Show all the orders, most recent first."""
+@app.route("/customers/<cust_no>/orders/<order_no>/view", methods=("GET",))
+@app.route("/customers/<cust_no>/orders/<order_no>/view/<page>", methods=("GET",))
+def order_view(cust_no, order_no, page=0):
+    """Show the order."""
 
     page = int(page)
 
     if page < 0:
-        return redirect(url_for("orders_index"))
-
-    with pool.connection() as conn:
-        with conn.cursor(row_factory=namedtuple_row) as cur:
-            query = """
-                    SELECT
-                        o.order_no,
-                        o.cust_no,
-                        o.date,
-                        p.cust_no AS paid_by,
-                        SUM(qty * price) AS total,
-                        SUM(qty) AS product_qty
-                    FROM orders o
-                    LEFT JOIN pay p USING (order_no)
-                    INNER JOIN contains USING (order_no)
-                    INNER JOIN product USING (sku)
-                    GROUP BY o.order_no, p.cust_no
-                    ORDER BY date DESC
-                    OFFSET %(page)s
-                    LIMIT 10;
-            """
-
-            orders = cur.execute(
-                query,
-                {"page": page * 10},
-            ).fetchall()
-
-            if cur.rowcount == 0 and page != 0:
-                return redirect(url_for("orders_index"))
-
-            cur.execute(
-                query,
-                {"page": (page + 1) * 10},
-            ).fetchall()
-
-            last = True if cur.rowcount == 0 else False
-
-    # API-like response is returned to clients that request JSON explicitly (e.g., fetch)
-    if (
-        request.accept_mimetypes["application/json"]
-        and not request.accept_mimetypes["text/html"]
-    ):
-        return jsonify(orders)
-
-    return render_template(
-        "orders/index.html",
-        orders=orders,
-        page=page,
-        last=last,
-    )
-
-@app.route("/customers/<cust_no>/orders/<order_no>/view", methods=("GET",))
-def order_view(cust_no, order_no):
-    """Show the order."""
+        return redirect(url_for("order_view", cust_no=cust_no, order_no=order_no))
 
     with pool.connection() as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
@@ -741,14 +708,28 @@ def order_view(cust_no, order_no):
             if order == None:
                 return redirect(url_for("customer_view", cust_no=cust_no))
 
-            products = cur.execute(
-                """
+            query = """
                 SELECT *
                 FROM contains
-                WHERE order_no = %(order_no)s;
-                """,
-                {"order_no": order_no},
+                WHERE order_no = %(order_no)s
+                OFFSET %(page)s
+                LIMIT 10;
+            """
+
+            products = cur.execute(
+                query,
+                {"order_no": order_no, "page": page * 10},
             ).fetchall()
+
+            if cur.rowcount == 0 and page != 0:
+                return redirect(url_for("customer_view", cust_no=cust_no))
+
+            cur.execute(
+                query,
+                {"order_no": order_no, "page": (page + 1) * 10},
+            ).fetchall()
+
+            last = True if cur.rowcount == 0 else False
 
     # API-like response is returned to clients that request JSON explicitly (e.g., fetch)
     if (
@@ -757,7 +738,7 @@ def order_view(cust_no, order_no):
     ):
         return jsonify({"order": order, "products": products})
 
-    return render_template("orders/view.html", order=order, products=products)
+    return render_template("orders/view.html", order=order, products=products, page=page, last=last)
 
 
 @app.route(

@@ -333,6 +333,10 @@ aside {
 	gap: 1rem;
 }
 
+.navigation-btn:last-of-type.prev {
+	margin-right: 7.05rem;
+}
+
 .navigation-btn.next {
 	padding-right: 1.1rem;
 	padding-left: 1.5rem;
@@ -427,14 +431,13 @@ aside {
 	grid-gap: 50px; /* Gap between grid items */
 }
 
-label.products-container-label {
-	margin: 0.8em 0 0 0;
-	font-size: 22px;
+.customer-orders-label,
+.order-products-label {
 	color: var(--light-blue);
 }
 
-.customer-orders-label {
-	color: var(--light-blue);
+.order-products-container {
+	margin: 0.8em 0 0 0;
 }
 
 input.save {
@@ -459,19 +462,31 @@ label.total-lbl {
 	font-weight: normal;
 }
 
-.orders-header {
+.customer-orders-header,
+.order-products-header {
 	display: flex;
 	align-items: center;
 	gap: 12px;
 }
 
-.orders-header > #orders-add-btn {
+.customer-orders-header > #orders-add-btn {
 	font-size: 14px;
 	gap: 6px;
 	border-radius: 2rem;
 	padding: 0.2rem 1rem 0.2rem 0.8rem;
 }
 
-.orders-header > #orders-add-btn > i {
+.customer-orders-header > #orders-add-btn > i {
 	font-size: 18px;
+}
+
+.customer-orders-header > .navigation,
+.order-products-header > .navigation {
+	font-size: 14px;
+	margin-right: 0;
+}
+
+.customer-orders-header > .navigation .navigation-btn:last-of-type.prev,
+.order-products-header > .navigation .navigation-btn:last-of-type.prev {
+	margin-right: 6.65rem;
 }

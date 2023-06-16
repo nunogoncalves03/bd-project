@@ -54,7 +54,23 @@
         </button>
         {% endif %}
     </div>
-    <label class="products-container-label">Products</label>
+    <div class="order-products-header">
+        <h1 class="order-products-label">Products</h1>
+        <div class="navigation">
+            {% if page > 0 %}
+            <a class="navigation-btn prev btn icon-btn" href="{{ url_for('order_view', cust_no=order['cust_no'], order_no=order['order_no'], page=page-1) }}">
+                <i class="bi bi-chevron-left"></i>
+                Prev
+            </a>
+            {% endif %}
+            {% if not last %}
+            <a class="navigation-btn next btn icon-btn" href="{{ url_for('order_view', cust_no=order['cust_no'], order_no=order['order_no'], page=page+1) }}">
+                Next
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
     <hr>
     <div class="products-container">
         <label id="sku-lbl">SKU:</label>

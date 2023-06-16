@@ -68,7 +68,7 @@ VALUES
         10,
         'Harper Evans',
         'harper.evans@outlook.com',
-        '933333322',
+        '933352322',
         'Rua da Revolucao 79 2Dir 2330-500 Torres Novas'
     ),
     (
@@ -222,12 +222,6 @@ SELECT
     ),
     2;
 
--- section 6
--- INSERT INTO orders (order_no, "date", cust_no)
--- SELECT
---     generate_series(749, 81101),
---     generate_series('1800-01-01'::TIMESTAMP, '2019-12-31'::TIMESTAMP, '1 day'),
---     3;
 INSERT INTO
     pay (order_no, cust_no)
 VALUES
@@ -677,20 +671,6 @@ VALUES
         9781234567931
     );
 
--- section 6
--- INSERT INTO product (sku, "name", "description", price, ean)
--- SELECT
---     generate_series(1, 500000),
---     CASE 
---         WHEN random() < 0.50 THEN 'A11111111'
---         ELSE 'B'
---     END,
---     NULL,
---     CASE 
---         WHEN random() < 0.50 THEN 20
---         ELSE 60
---     END,
---     NULL;
 INSERT INTO
     contains (order_no, sku, qty)
 VALUES
@@ -765,55 +745,113 @@ SELECT
     'PRI-RD-B4-36',
     2;
 
--- section 6
--- INSERT INTO contains (order_no, sku, qty)
--- SELECT
---     generate_series(749, 81101),
---     (random() * (500000 - 1) + 1)::INTEGER,
---     2;
--- section 6
--- INSERT INTO contains (order_no, sku, qty)
--- SELECT
---     (random() * (11 - 5 - 1) + 5)::INTEGER,
---     generate_series(1, 500000),
---     2;
 INSERT INTO
     supplier (tin, "name", "address", sku, "date")
 VALUES
     (
         '123456789',
-        'John Doe',
+        'Stellar Supplies',
         'Rua do Cacto 12 1200-234 Alcantara',
         'PRI-WH-B1-38',
-        DATE '2023-05-21'
+        DATE '2023-09-15'
     ),
     (
         '987654321',
-        'Jane Smith',
+        'Horizon Trading Co.',
         'Rua Do Grilo 22 5000-500 Porto',
         'PRI-RD-B4-36',
-        DATE '2023-05-21'
+        DATE '2024-03-27'
     ),
     (
         '456789123',
-        'David Johnson',
+        'Atlas Enterprises',
         'Rua D. Sancho I 65 2955-500 Almada',
         'NIK-BK-H2-42',
-        DATE '2023-05-21'
+        DATE '2023-12-08'
     ),
     (
         '321654987',
-        'Emily Davis',
+        'Silverline Distributors',
         'Largo D. Afonso Henriques 25 3004-500 Ramada',
         'NIK-BK-H4-35',
-        DATE '2023-05-21'
+        DATE '2024-07-23'
     ),
     (
         '789123456',
-        'Michael Wilson',
+        'Sunburst Imports',
         'Rua das Rosas 123 1000-500 Alvalade',
         'RLX-GD-B5-00',
-        DATE '2023-05-21'
+        DATE '2024-08-05'
+    ),
+    (
+        '234567890',
+        'Emerald Global Services',
+        'Avenida da Liberdade 50 1500-234 Lisboa',
+        'L&V-PP-H4-40',
+        DATE '2023-07-10'
+    ),
+    (
+        '876543210',
+        'Vanguard Merchants',
+        'Rua dos Lírios 78 2500-500 Coimbra',
+        'NIK-BK-H4-35',
+        DATE '2024-10-19'
+    ),
+    (
+        '567890123',
+        'Crestline Traders',
+        'Praceta das Oliveiras 10 3500-500 Braga',
+        'H&M-PK-H4-40',
+        DATE '2023-11-30'
+    ),
+    (
+        '654321987',
+        'Golden Harvest Suppliers',
+        'Avenida das Flores 27 4000-500 Faro',
+        'PRI-WH-B2-40',
+        DATE '2024-09-02'
+    ),
+    (
+        '901234567',
+        'Pacific Trading Company',
+        'Rua do Sol 99 2000-500 Sintra',
+        'PRI-GR-T2-38',
+        DATE '2023-08-12'
+    ),
+    (
+        '345678912',
+        'Evergreen Sourcing Solutions',
+        'Largo das Figueiras 14 6000-500 Setúbal',
+        'H&M-WH-D4-36',
+        DATE '2023-10-07'
+    ),
+    (
+        '789012345',
+        'Azure Logistics',
+        'Avenida do Mar 33 7000-500 Évora',
+        'PRI-RD-B4-36',
+        DATE '2024-06-16'
+    ),
+    (
+        '098765432',
+        'Sapphire Enterprises',
+        'Rua do Bosque 87 8000-500 Albufeira',
+        'H&M-BL-J1-42',
+        DATE '2023-07-25'
+    ),
+    (
+        '543210987',
+        'Royal Crest Imports',
+        'Praceta dos Pinheiros 19 9000-500 Viseu',
+        'L&V-BK-D3-40',
+        DATE '2024-11-03'
+    ),
+    (
+        '876543219',
+        'Moonlight Distributors',
+        'Avenida dos Carvalhos 75 1000-500 Leiria',
+        'APL-WH-PR-00',
+        DATE '2024-12-29'
     );
 
 -- NIK-BK-H4-35 e RLX-GD-B5-00 acima de 50$
